@@ -2,7 +2,7 @@ import { View, Text } from 'react-native';
 import React from 'react';
 import { Tabs } from 'expo-router';
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { COLORS } from './../../constants/Colors';
+import { COLORS } from '../../constants/Colors';
 
 export default function TabLayout() {
   return (
@@ -30,6 +30,21 @@ export default function TabLayout() {
           tabBarIcon: ({ color }) => <Ionicons name="person" size={24} color={color} />,
         }}
       />
+
+      {/* Hidden job detail route - uses tabBarItemStyle to drop the slot entirely*/}
+      <Tabs.Screen
+        name="job/[jobId]/index"
+        options={{
+          headerShown: false,
+          // hide from tab bar
+          tabBarItemStyle: { display: 'none' },
+        }}
+      />
+      {/* Uncomment when ready:
+      <Tabs.Screen name="job/[jobId]/quiz" options={{ headerShown: true, tabBarButton: () => null }} />
+      <Tabs.Screen name="job/[jobId]/game" options={{ headerShown: true, tabBarButton: () => null }} />
+      */}
+
     </Tabs>
   );
 }
