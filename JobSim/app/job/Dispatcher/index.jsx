@@ -5,80 +5,60 @@ import {
   View,
   Text,
   StyleSheet,
-  Dimensions,
   TouchableOpacity,
+  Dimensions,
 } from 'react-native';
-import { useLocalSearchParams, useRouter } from 'expo-router';
-import { COLORS } from '../../../../constants/Colors';
-import jobs from '../../../../data/jobs';
+import { useRouter } from 'expo-router';
+import { COLORS } from '../../../constants/Colors';
+import job from '../../../data/jobs/dispatcher';
 
-export default function JobDetail() {
-  const { jobId } = useLocalSearchParams();
+export default function DispatcherScreen() {
   const router = useRouter();
-  const data = jobs[jobId] || {};
-
-  if (!data.title) {
-    return (
-      <SafeAreaView style={styles.center}>
-        <Text>Job “{jobId}” not found</Text>
-      </SafeAreaView>
-    );
-  }
 
   return (
     <SafeAreaView style={styles.safe}>
       <ScrollView contentContainerStyle={styles.content}>
-        <Text style={styles.header}>{data.title}</Text>
-        <Text style={styles.description}>{data.description}</Text>
+        <Text style={styles.header}>{job.title}</Text>
+        <Text style={styles.description}>{job.description}</Text>
 
         <Text style={styles.subheader}>Requirements</Text>
-        {data.requirements.map((req, i) => (
-          <Text key={i} style={styles.bullet}>
-            • {req}
-          </Text>
+        {job.requirements.map((req, i) => (
+          <Text key={i} style={styles.bullet}>• {req}</Text>
         ))}
 
-        {/* Button row */}
         <View style={styles.buttonContainer}>
           <TouchableOpacity
             style={styles.button}
-            onPress={() => router.push(`/job/${jobId}/quiz`)}
-            activeOpacity={0.7}
+            onPress={() => router.push('/job/Dispatcher/quiz')}
           >
             <Text style={styles.buttonText}>Take the Quiz</Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.button}
-            onPress={() => router.push(`/job/${jobId}/game`)}
-            activeOpacity={0.7}
+            onPress={() => router.push('/job/Dispatcher/game')}
           >
             <Text style={styles.buttonText}>Start the Game</Text>
           </TouchableOpacity>
         </View>
       </ScrollView>
+
+      <View style={styles.bottomBar}>
+        <TouchableOpacity onPress={() => router.push('/explore')} style={styles.backButton}>
+          <Text style={styles.backText}>← Back to Explore</Text>
+        </TouchableOpacity>
+      </View>
     </SafeAreaView>
   );
 }
 
 const { width } = Dimensions.get('window');
 const P = 16;
-const BUTTON_HEIGHT = 60;
 
 const styles = StyleSheet.create({
-  safe: {
-    flex: 1,
-    backgroundColor: COLORS.white,
-  },
-  content: {
-    padding: P,
-  },
-  center: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
+  safe: { flex: 1, backgroundColor: COLORS.white },
+  content: { padding: P, paddingBottom: 40 },
   header: {
-    fontSize: 28,
+    fontSize: 24,
     fontWeight: '700',
     marginBottom: 12,
     color: COLORS.black,
@@ -89,7 +69,6 @@ const styles = StyleSheet.create({
     lineHeight: 22,
     marginBottom: 16,
     color: COLORS.black,
-    textAlign: 'justify',
   },
   subheader: {
     fontSize: 20,
@@ -110,23 +89,30 @@ const styles = StyleSheet.create({
   },
   button: {
     flex: 1,
-    height: BUTTON_HEIGHT,
     marginHorizontal: 4,
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.activeIcon,
     borderRadius: 12,
+    padding: 16,
     alignItems: 'center',
-    justifyContent: 'center',
-    // shadows for iOS
-    shadowColor: '#000',
-    shadowOpacity: 0.1,
-    shadowOffset: { width: 0, height: 2 },
-    shadowRadius: 4,
-    // elevation for Android
-    elevation: 3,
   },
   buttonText: {
     fontSize: 16,
     fontWeight: '600',
+    color: COLORS.white,
+  },
+  bottomBar: {
+    borderTopWidth: 1,
+    borderTopColor: '#ddd',
+    padding: 16,
+    alignItems: 'center',
+  },
+  backButton: {
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+  },
+  backText: {
     color: COLORS.activeIcon,
+    fontSize: 16,
+    fontWeight: '500',
   },
 });

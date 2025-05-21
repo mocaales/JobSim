@@ -1,11 +1,11 @@
 import dispatcher from './dispatcher';
-import prodajalec from './prodajalec';
+import cashier from './cashier';
 // import coder      from './coder';
 // import designer   from './designer';
 
 export default {
   dispatcher,
-  prodajalec,
+  cashier,
   // coder,
   // designer,
 };
