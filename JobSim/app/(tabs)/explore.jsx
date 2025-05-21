@@ -10,6 +10,11 @@ const JOBS = [
     name: 'Dispatcher',
     iconName: 'card-account-phone-outline',
   },
+  {
+    id: 'prodajalec',
+    name: 'Prodajalec',
+    iconName: 'cart-outline',
+  },
   // later: { id: 'coder', name: 'Coder', iconName: 'laptop-code' }, …
 ];
 
