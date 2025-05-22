@@ -26,4 +26,6 @@ export default {
     }
     //..več vprašanj
   ],
+
+  //game time!
 };
