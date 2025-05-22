@@ -6,7 +6,7 @@ import { useRouter } from 'expo-router';
 import { COLORS } from '../../../constants/Colors';
 import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
 
-const HOSPITAL = [15.6378, 46.5570]; // lon,lat for Maribor hospital
+const HOSPITAL = [15.64869, 46.55175]; // lon,lat for Maribor hospital
 
 export default function DispatcherGame() {
 
