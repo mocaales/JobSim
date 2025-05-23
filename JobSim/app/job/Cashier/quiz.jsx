@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   SafeAreaView,
   View,
@@ -8,11 +8,14 @@ import {
   Dimensions,
 } from 'react-native';
 import { useRouter } from 'expo-router';
+import { useUser } from '@clerk/clerk-expo';
+import { saveResult } from '../../../hooks/saveResults';
 import { COLORS } from '../../../constants/Colors';
 import job from '../../../data/jobs/cashier';
 
 export default function CashierQuiz() {
   const router = useRouter();
+  const { user } = useUser();
   const questions = job.quizQuestions;
 
   const [index, setIndex] = useState(0);
@@ -37,14 +40,32 @@ export default function CashierQuiz() {
     }
   };
 
+  useEffect(() => {
+    if (finished) {
+      const sendData = async () => {
+        try {
+          await saveResult({
+            userId: user?.id || 'guest',
+            job: 'Cashier',
+            score,
+          });
+          console.log('✅ Result saved to backend');
+        } catch (err) {
+          console.warn('⚠️ Failed to save result');
+        }
+      };
+      sendData();
+    }
+  }, [finished]);
+
   return (
     <SafeAreaView style={styles.safe}>
       {finished ? (
         <View style={styles.center}>
-          <Text style={styles.header}>Zaključen kviz</Text>
-          <Text style={styles.score}>Rezultat: {score} / {questions.length}</Text>
+          <Text style={styles.header}>Quiz Completed</Text>
+          <Text style={styles.score}>Score: {score} / {questions.length}</Text>
           <TouchableOpacity onPress={() => router.back()} style={styles.button}>
-            <Text style={styles.buttonText}>Nazaj</Text>
+            <Text style={styles.buttonText}>Back</Text>
           </TouchableOpacity>
         </View>
       ) : (
@@ -67,7 +88,7 @@ export default function CashierQuiz() {
             style={[styles.button, { marginTop: 20 }]}
             disabled={selected === null}
           >
-            <Text style={styles.buttonText}>Naprej</Text>
+            <Text style={styles.buttonText}>Next</Text>
           </TouchableOpacity>
         </View>
       )}

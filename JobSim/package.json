@@ -17,6 +17,7 @@
     "@react-navigation/elements": "^2.3.8",
     "@react-navigation/native": "^7.1.9",
     "@turf/turf": "^7.2.0",
+    "axios": "^1.9.0",
     "expo": "~53.0.9",
     "expo-auth-session": "~6.1.5",
     "expo-blur": "~14.1.4",
@@ -43,7 +44,8 @@
     "react-native-screens": "~4.10.0",
     "react-native-vector-icons": "^10.2.0",
     "react-native-web": "~0.20.0",
-    "react-native-webview": "13.13.5"
+    "react-native-webview": "13.13.5",
+    "zustand": "^5.0.5"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",
