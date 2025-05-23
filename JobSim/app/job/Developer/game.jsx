@@ -2,19 +2,7 @@ import { View, Text, StyleSheet, FlatList, TouchableOpacity } from 'react-native
 import React from 'react';
 import { useRouter } from 'expo-router';
 import { COLORS } from '../../../constants/Colors';
-
-const TASKS = [
-  { id: '1', title: 'Popravi funkcijo seštevanja', difficulty: 1 },
-  { id: '2', title: 'Uredi pogojni stavek', difficulty: 2 },
-  { id: '3', title: 'Popravi zanko', difficulty: 3 },
-  { id: '4', title: 'Popravi format JSON', difficulty: 2 },
-  { id: '5', title: 'Fix array destructuring', difficulty: 1 },
-  { id: '6', title: 'Napaka v API klicu', difficulty: 3 },
-  { id: '7', title: 'Zamenjan operator', difficulty: 1 },
-  { id: '8', title: 'Neveljaven import', difficulty: 2 },
-  { id: '9', title: 'Manjkajoča ključna beseda', difficulty: 3 },
-  { id: '10', title: 'Neveljaven return', difficulty: 2 },
-];
+import { developerTasks } from '../../../data/developerTasks';
 
 export default function Game() {
   const router = useRouter();
@@ -25,15 +13,15 @@ export default function Game() {
       onPress={() => router.push(`/job/Developer/tasks/${item.id}`)}
     >
       <Text style={styles.taskTitle}>{item.title}</Text>
-      <Text style={styles.difficulty}>Zahtevnost: {item.difficulty}</Text>
+      <Text style={styles.difficulty}>Difficulty: {item.difficulty}</Text>
     </TouchableOpacity>
   );
 
   return (
     <View style={styles.container}>
-      <Text style={styles.header}>Izberi nalogo za odpravljanje napake:</Text>
+      <Text style={styles.header}>Choose a debugging task:</Text>
       <FlatList
-        data={TASKS}
+        data={developerTasks}
         keyExtractor={(item) => item.id}
         renderItem={renderItem}
       />
