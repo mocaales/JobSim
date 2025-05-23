@@ -51,6 +51,20 @@ export default function TabLayout() {
       <Tabs.Screen name="job/[jobId]/game" options={{ headerShown: true, tabBarButton: () => null }} />
       */}
 
+      <Tabs.Screen
+        name="job/Developer/index"
+        options={{ headerShown: false, tabBarItemStyle: { display: 'none' } }}
+      />
+      <Tabs.Screen
+        name="job/Developer/quiz"
+        options={{ headerShown: false, tabBarItemStyle: { display: 'none' } }}
+      />
+      <Tabs.Screen
+        name="job/Developer/game"
+        options={{ headerShown: false, tabBarItemStyle: { display: 'none' } }}
+      />
+
+
     </Tabs>
   );
 }
