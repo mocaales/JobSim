@@ -5,75 +5,57 @@ import {
 import { useRouter } from 'expo-router';
 import { COLORS } from '../../../constants/Colors';
 
-const CUSTOMERS = [
-  { name: 'Granny May', mood: 'angry' },
-  { name: 'Joe', mood: 'happy' },
-  { name: 'Nina', mood: 'neutral' },
-  { name: 'Marta', mood: 'happy' },
-  { name: 'Leo', mood: 'angry' },
-  { name: 'Sara', mood: 'neutral' },
-  { name: 'Tom', mood: 'happy' },
-  { name: 'Anna', mood: 'neutral' },
-  { name: 'Mike', mood: 'neutral' },
+const regularItems = [
+  { name: 'Steak', price: 5.8 }, { name: 'Apple', price: 1 }, { name: 'Broccoli', price: 1.3 },
+  { name: 'Lettuce', price: 1.1 }, { name: 'Bread', price: 2.5 }, { name: 'Milk', price: 1.2 },
+  { name: 'Eggs', price: 3 }, { name: 'Chicken', price: 4.5 }, { name: 'Pizza', price: 15 },
+  { name: 'Burger', price: 12 }, { name: 'Sandwich', price: 5 }, { name: 'Wrap', price: 6 },
+  { name: 'Taco', price: 7 }, { name: 'Pancakes', price: 8 }, { name: 'Salmon', price: 20 },
+  { name: 'Lamb Chops', price: 30 }, { name: 'Pork Roast', price: 25 }, { name: 'Cheddar Cheese', price: 4 },
+  { name: 'Yogurt', price: 2 }, { name: 'Olives', price: 3 }, { name: 'Breadsticks', price: 2 },
+  { name: 'Chocolate Cake', price: 10 }, { name: 'Baguette', price: 2 }, { name: 'Butter', price: 2 },
+  { name: 'Ice Cream', price: 5 }, { name: 'Fruits', price: 6 }, { name: 'Juice', price: 3 },
+  { name: 'Ham', price: 15 }, { name: 'Salad', price: 4 }, { name: 'Soup', price: 8 },
+  { name: 'Cheese Platter', price: 25 }, { name: 'Bottle of Wine', price: 40 }, { name: 'Shrimp', price: 30 },
+  { name: 'Crab Legs', price: 50 }, { name: 'Whole Turkey', price: 60 }, { name: 'Vegetable Mix', price: 1.3 },
+  { name: 'Fruit Salad', price: 4.6 }, { name: 'Bread Loaf', price: 2.4 }, { name: 'Pastry', price: 3.2 },
+  { name: 'Cereal', price: 2.8 }, { name: 'Granola Bar', price: 2 }, { name: 'Rice', price: 1.9 },
+  { name: 'Pasta', price: 2.2 }, { name: 'Sauce', price: 2 }, { name: 'Spices', price: 1.4 },
+  { name: 'Herbs', price: 1.6 }, { name: 'Nuts', price: 3 }, { name: 'Seeds', price: 2.3 },
+  { name: 'Beans', price: 1.7 }, { name: 'Lentils', price: 1.9 }, { name: 'Chickpeas', price: 2.1 },
+  { name: 'Tofu', price: 3.2 }, { name: 'Tempeh', price: 4.5 }, { name: 'Quinoa', price: 3.8 },
+  { name: 'Couscous', price: 2.5 }, { name: 'Polenta', price: 2.0 }, { name: 'Oats', price: 1.6 },
 ];
 
-const ITEMS = [
-  { name: 'Steak', price: 5.8 },
-  { name: 'Apple', price: 1 },
-  { name: 'Broccoli', price: 1.3 },
-  { name: 'Lettuce', price: 1.1 },
-  { name: 'Bread', price: 2.5 },
-  { name: 'Milk', price: 1.2 },
-  { name: 'Cheese', price: 3.4 },
-  { name: 'Tomato', price: 0.9 },
-  { name: 'Butter', price: 2 },
-  { name: 'Juice', price: 1.8 },
-  { name: 'Eggs', price: 3 },
-  { name: 'Chicken', price: 4.5 },
-  { name: 'Fish', price: 6.2 },
-  { name: 'Rice', price: 1.5 },
-  { name: 'Pasta', price: 1.7 },
-  { name: 'Yogurt', price: 0.8 },
-  { name: 'Chocolate', price: 2.2 },
-  { name: 'Cookies', price: 1.6 },
-  { name: 'Ice Cream', price: 3.5 },
-  { name: 'Soda', price: 1.4 },
-  { name: 'Tea', price: 1.1 },
-  { name: 'Coffee', price: 2.3 },
-  { name: 'Cereal', price: 2.8 },
-  { name: 'Chips', price: 1.9 },
-  { name: 'Candy', price: 0.5 },
-  { name: 'Nuts', price: 3.2 },
-  { name: 'Popcorn', price: 1.4 },
-  { name: 'Sauce', price: 1.5 },
-  { name: 'Spices', price: 2.1 },
-  { name: 'Vegetables', price: 1.0 },
-  { name: 'Fruits', price: 1.2 },
-  { name: 'Salad', price: 2.0 },
-  { name: 'Soup', price: 3.0 },
-  { name: 'Pizza', price: 4.0 },
-  { name: 'Burger', price: 5.0 },
-  { name: 'Sandwich', price: 3.5 },
-  { name: 'Wrap', price: 4.5 },
-  { name: 'Taco', price: 3.0 },
-  { name: 'Pancakes', price: 2.5 },
-  { name: 'Waffles', price: 3.2 },
-  { name: 'Bagel', price: 1.8 },
-  { name: 'Donut', price: 1.0 },
-  { name: 'Muffin', price: 1.5 },
-  { name: 'Croissant', price: 2.0 },
+const nonRoundedItems = [
+  { name: 'Chili', price: 1.99 }, { name: 'Avocado', price: 2.79 }, { name: 'Mango', price: 3.49 },
+  { name: 'Blueberry', price: 1.89 }, { name: 'Olive Oil', price: 4.99 }, { name: 'Pineapple', price: 2.69 },
+  { name: 'Special Cheese', price: 15.49 }, { name: 'Organic Salmon', price: 28.79 }, { name: 'Prosciutto', price: 22.59 },
+  { name: 'Black Truffle', price: 55.99 }, { name: 'Premium Wine', price: 59.49 }, { name: 'Exotic Fruit Basket', price: 45.79 },
+  { name: 'Seafood Platter', price: 39.29 }, { name: 'Imported Spices', price: 8.19 }, { name: 'Fancy Chocolate', price: 12.69 },
+  { name: 'Barley', price: 1.82 }, { name: 'Buckwheat', price: 2.41 }, { name: 'Millet', price: 2.16 },
+  { name: 'Farro', price: 3.04 }, { name: 'Rye Bread', price: 2.69 }, { name: 'Sourdough Bread', price: 3.58 },
+  { name: 'Bagel', price: 1.97 }, { name: 'Croissant', price: 2.79 }, { name: 'Danish Pastry', price: 3.38 },
+  { name: 'Cinnamon Roll', price: 2.89 }, { name: 'Biscotti', price: 1.59 }, { name: 'Granola', price: 4.26 },
+  { name: 'Muesli', price: 3.81 }, { name: 'Rice Cakes', price: 1.63 }, { name: 'Pita Bread', price: 1.44 },
+  { name: 'Naan Bread', price: 2.24 }, { name: 'Tortilla', price: 1.73 }, { name: 'Polish Sausage', price: 3.92 },
+  { name: 'Chorizo', price: 4.55 }, { name: 'Salami', price: 3.66 }, { name: 'Pepperoni', price: 2.89 },
+  { name: 'Bacon', price: 5.02 }, { name: 'Prosciutto Ham', price: 6.51 }, { name: 'Serrano Ham', price: 7.26 },
+  { name: 'Capicola', price: 4.81 }, { name: 'Pastrami', price: 5.53 }, { name: 'Corned Beef', price: 6.02 },
+  { name: 'Duck Breast', price: 8.02 }, { name: 'Lamb Shank', price: 9.56 }, { name: 'Beef Tenderloin', price: 12.08 },
+  { name: 'Pork Belly', price: 7.56 }, { name: 'Rabbit', price: 10.02 }, { name: 'Venison Steak', price: 15.03 },
+  { name: 'Wild Boar Sausage', price: 11.02 }, { name: 'Bison Burger', price: 13.01 }, { name: 'Elk Steak', price: 14.07 },
 ];
 
-const COINS = [0.01, 0.02, 0.05, 0.1, 0.2, 0.5, 1, 2, 5, 10, 20];
+const COINS = [0.01, 0.02, 0.05, 0.1, 0.2, 0.5, 1, 2, 5, 10, 20, 50];
 
 export default function CashierGame() {
   const router = useRouter();
   const [showIntro, setShowIntro] = useState(true);
   const [difficulty, setDifficulty] = useState('medium');
   const [round, setRound] = useState(1);
-  const [score, setScore] = useState(0);
-  const [time, setTime] = useState(15);
-  const [customer, setCustomer] = useState(CUSTOMERS[0]);
+  const [elapsedTime, setElapsedTime] = useState(0);
+  const [correctCount, setCorrectCount] = useState(0);
   const [bill, setBill] = useState([]);
   const [paid, setPaid] = useState(0);
   const [returnAmount, setReturnAmount] = useState(0);
@@ -81,51 +63,56 @@ export default function CashierGame() {
   const [showResult, setShowResult] = useState(false);
   const [isCorrect, setIsCorrect] = useState(false);
   const [gameOver, setGameOver] = useState(false);
-  const scaleAnim = useState(new Animated.Value(1))[0];
+  const [errorMsg, setErrorMsg] = useState('');
+
+  useEffect(() => {
+    if (!showIntro && !gameOver) {
+      const timer = setInterval(() => setElapsedTime((t) => t + 1), 1000);
+      return () => clearInterval(timer);
+    }
+  }, [showIntro, gameOver]);
 
   useEffect(() => {
     if (!showIntro && round <= 10) generateNewRound();
   }, [round, showIntro]);
 
-  useEffect(() => {
-    if (showIntro || time <= 0) {
-      if (time <= 0) checkResult(false);
-      return;
+  const generateBillItems = () => {
+    let selected = [];
+
+    if (difficulty === 'easy') {
+      selected = Array.from({ length: 3 }, () => regularItems[Math.floor(Math.random() * regularItems.length)]);
+    } else if (difficulty === 'medium') {
+      selected.push(nonRoundedItems[Math.floor(Math.random() * nonRoundedItems.length)]);
+      while (selected.length < 3) selected.push(regularItems[Math.floor(Math.random() * regularItems.length)]);
+    } else if (difficulty === 'hard') {
+      selected.push(nonRoundedItems[Math.floor(Math.random() * nonRoundedItems.length)]);
+      selected.push(nonRoundedItems[Math.floor(Math.random() * nonRoundedItems.length)]);
+      while (selected.length < 3) selected.push(regularItems[Math.floor(Math.random() * regularItems.length)]);
     }
 
-    if (time <= 3) {
-      Animated.sequence([
-        Animated.timing(scaleAnim, { toValue: 1.5, duration: 200, easing: Easing.linear, useNativeDriver: true }),
-        Animated.timing(scaleAnim, { toValue: 1, duration: 200, easing: Easing.linear, useNativeDriver: true }),
-      ]).start();
-    }
-
-    const timer = setTimeout(() => setTime(time - 1), 1000);
-    return () => clearTimeout(timer);
-  }, [time, showIntro]);
+    return selected;
+  };
 
   const generateNewRound = () => {
-    const newCustomer = CUSTOMERS[Math.floor(Math.random() * CUSTOMERS.length)];
-    const billItems = Array.from({ length: 3 }, () => ITEMS[Math.floor(Math.random() * ITEMS.length)]);
+    const billItems = generateBillItems();
     const sum = billItems.reduce((acc, item) => acc + item.price, 0);
-    const payOptions = [5, 10, 20].filter((val) => val > sum);
-    const paidAmount = payOptions[Math.floor(Math.random() * payOptions.length)];
+    const payOptions = COINS.filter((val) => val > sum);
+    const paidAmount = payOptions.length > 0 ? payOptions[Math.floor(Math.random() * payOptions.length)] : Math.ceil(sum + 10);
     const returnAmount = parseFloat((paidAmount - sum).toFixed(2));
-    const baseTime = newCustomer.mood === 'angry' ? 8 : newCustomer.mood === 'happy' ? 15 : 12;
-    const diffMultiplier = difficulty === 'easy' ? 1.5 : difficulty === 'hard' ? 0.7 : 1;
 
-    setCustomer(newCustomer);
     setBill(billItems);
     setPaid(paidAmount);
     setReturnAmount(returnAmount);
     setCollected(0);
-    setTime(Math.floor(baseTime * diffMultiplier));
+    setErrorMsg('');
   };
 
   const handleAddCoin = (value) => {
     const newTotal = parseFloat((collected + value).toFixed(2));
     if (newTotal > returnAmount) {
-      checkResult(false);
+      setCollected(0);
+      setErrorMsg('❌ Too much! Try again!');
+      setTimeout(() => setErrorMsg(''), 1500);
       return;
     }
     if (newTotal === returnAmount) {
@@ -139,11 +126,14 @@ export default function CashierGame() {
   const checkResult = (success) => {
     setIsCorrect(success);
     setShowResult(true);
-    if (success) setScore((s) => s + 1);
+    if (success) setCorrectCount((c) => c + 1);
     setTimeout(() => {
       setShowResult(false);
-      if (round < 10) setRound((r) => r + 1);
-      else setGameOver(true);
+      if (success && correctCount + 1 >= 10) {
+        setGameOver(true);
+      } else if (success) {
+        setRound((r) => r + 1);
+      }
     }, 1500);
   };
 
@@ -152,7 +142,6 @@ export default function CashierGame() {
     router.push('/explore');
   };
 
-  const getMoodEmoji = (mood) => mood === 'angry' ? '😡' : mood === 'happy' ? '🙂' : '😐';
   const getCoinStyle = (value) => value <= 0.05 ? { ...styles.coin, ...styles.bronzeCoin } :
                                    value <= 2 ? { ...styles.coin, ...styles.goldCoin } : { ...styles.coin, ...styles.bill };
 
@@ -186,10 +175,8 @@ export default function CashierGame() {
       {!gameOver && (
         <View style={styles.container}>
           <View style={styles.header}>
-            <Text style={styles.name}>{customer.name} {getMoodEmoji(customer.mood)}</Text>
-            <Animated.View style={[styles.timerCircle, time <= 3 && { transform: [{ scale: scaleAnim }] }]}>
-              <Text style={[styles.timerText, time <= 3 && styles.timerTextUrgent]}>{time}s</Text>
-            </Animated.View>
+            <Text style={styles.name}> {difficulty.toUpperCase()}</Text>
+            <Text style={styles.timerText}>Time: {elapsedTime}s</Text>
           </View>
           <View style={styles.receiptContainer}>
             <Text style={styles.receiptTitle}>🧾 Receipt</Text>
@@ -198,7 +185,7 @@ export default function CashierGame() {
               <Text key={index} style={styles.receiptText}>{item.name.padEnd(15)} €{item.price.toFixed(2)}</Text>
             ))}
             <View style={styles.separator} />
-            <Text style={[styles.receiptText, { fontWeight: 'bold' }]}>Paid:{' '.repeat(10)}€{paid}</Text>
+            <Text style={[styles.receiptText, { fontWeight: 'bold' }]}>Paid:{' '.repeat(10)}€{paid.toFixed(2)}</Text>
           </View>
           <Text style={styles.collectedText}>Your Collected: €{collected.toFixed(2)}</Text>
           <View style={styles.coinGrid}>
@@ -210,18 +197,19 @@ export default function CashierGame() {
           </View>
         </View>
       )}
-      <Modal visible={showResult || gameOver} transparent animationType="fade">
+      <Modal visible={showResult || gameOver || errorMsg !== ''} transparent animationType="fade">
         <View style={styles.popup}>
           {gameOver ? (
             <>
-              <Text style={styles.popupHeader}>🎉 Your Score</Text>
-              <Text style={styles.score}>{score}/10</Text>
-              <Text style={styles.percentage}>{Math.round((score / 10) * 100)}%</Text>
-              <Text style={styles.difficulty}>Your difficulty: {difficulty.charAt(0).toUpperCase() + difficulty.slice(1)}</Text>
+              <Text style={styles.popupHeader}>🎉 Your Time</Text>
+              <Text style={styles.score}>{elapsedTime} seconds</Text>
+              <Text style={styles.difficulty}>Difficulty: {difficulty}</Text>
               <TouchableOpacity style={styles.button} onPress={finishGame}>
-                <Text style={styles.buttonText}>Back to Cashier</Text>
+                <Text style={styles.buttonText}>Back to Menu</Text>
               </TouchableOpacity>
             </>
+          ) : errorMsg !== '' ? (
+            <Text style={styles.wrong}>{errorMsg}</Text>
           ) : (
             <Text style={isCorrect ? styles.correct : styles.wrong}>
               {isCorrect ? '✅ Correct' : '❌ Wrong'}
