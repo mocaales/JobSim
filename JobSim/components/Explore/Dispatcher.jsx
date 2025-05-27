@@ -30,7 +30,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     marginHorizontal: 16,
     marginBottom: 12,
-    marginTop: 60,
+    marginTop: 12,
     shadowColor: '#000',
     shadowOpacity: 0.05,
     shadowOffset: { width: 0, height: 2 },
