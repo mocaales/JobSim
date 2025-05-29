@@ -1,4 +1,4 @@
-// app/job/Developer/index.jsx
+// app/job/SpecUrgMed/index.jsx
 import React from 'react';
 import {
   SafeAreaView,
@@ -11,19 +11,21 @@ import {
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { COLORS } from '../../../constants/Colors';
+//import { GameContext, GameProvider } from './GameContext';
+//import scenarios from './scenarios';
 
-export default function DeveloperScreen() {
+export default function SpecUrgMedScreen() {
   const router = useRouter();
 
   const job = {
-    title: 'Junior Developer',
+    title: 'Emergency Medicine Specialist',
     description:
-      'A junior developer writes and maintains code, fixes bugs, and collaborates with teams to build and improve software. They often work under the supervision of senior developers and are responsible for implementing basic features and learning development workflows.',
+      'Make critical, life-saving decisions under pressure in the ER. Diagnose fast, act decisively—every choice matters!',
     requirements: [
-      'Basic knowledge of HTML, CSS, and JavaScript',
-      'Understanding of version control (Git)',
-      'Problem-solving mindset',
-      'Ability to work in a team environment',
+      'Basic knowledge of ABCDE approach',
+      'Ability to perform rapid triage',
+      'Familiarity with common ER procedures',
+      'Calm under pressure',
     ],
   };
 
@@ -33,29 +35,35 @@ export default function DeveloperScreen() {
         <Text style={styles.header}>{job.title}</Text>
         <Text style={styles.description}>{job.description}</Text>
 
-        <Text style={styles.subheader}>Requirements</Text>
+        <Text style={styles.subheader}>Core Skills</Text>
         {job.requirements.map((req, i) => (
           <Text key={i} style={styles.bullet}>• {req}</Text>
         ))}
 
         <View style={styles.buttonContainer}>
+          {/* Quiz button */}
           <TouchableOpacity
             style={styles.button}
-            onPress={() => router.push('/job/Developer/quiz')}
+            onPress={() => router.push('/job/SpecUrgMed/quiz')}
           >
-            <Text style={styles.buttonText}>Take the Quiz</Text>
+            <Text style={styles.buttonText}>Take the ER Quiz</Text>
           </TouchableOpacity>
+
+          {/* Game button */}
           <TouchableOpacity
-          style={[styles.button, { backgroundColor: COLORS.activeIcon }]}
-          onPress={() => router.push('/job/Developer/game')}
-        >
-          <Text style={styles.buttonText}>Start Debugger Game</Text>
-        </TouchableOpacity>
+            style={[styles.button, { backgroundColor: COLORS.activeIcon }]}
+            onPress={() => router.push('/job/SpecUrgMed/game')}
+          >
+            <Text style={styles.buttonText}>Play the Game</Text>
+          </TouchableOpacity>
         </View>
       </ScrollView>
 
       <View style={styles.bottomBar}>
-        <TouchableOpacity onPress={() => router.push('/explore')} style={styles.backButton}>
+        <TouchableOpacity
+          onPress={() => router.push('/explore')}
+          style={styles.backButton}
+        >
           <Text style={styles.backText}>← Back to Explore</Text>
         </TouchableOpacity>
       </View>

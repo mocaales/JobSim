@@ -1,20 +1,80 @@
-import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Alert } from 'react-native';
-import React from 'react';
+// app/job/Developer/tasks/[taskId].jsx or appropriate path
+import React, { useState } from 'react';
+import { View, Text, TouchableOpacity, StyleSheet, Alert, Dimensions } from 'react-native';
+import DraggableFlatList from 'react-native-draggable-flatlist';
+import { WebView } from 'react-native-webview';
 import { useLocalSearchParams } from 'expo-router';
 import { COLORS } from '../../../../constants/Colors';
 import { developerTasks } from '../../../../data/developerTasks';
 
+const htmlTemplate = (code) => `
+  <!doctype html>
+  <html>
+    <head>
+      <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0" />
+      <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/atom-one-dark.min.css"
+      />
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script>
+      <style>
+        body { margin: 0; padding: 12px; background: #282C34; }
+        pre { margin: 0; }
+      </style>
+    </head>
+    <body>
+      <pre><code class="language-javascript">${code}</code></pre>
+    </body>
+  </html>
+`;
+
 export default function TaskDetail() {
   const { taskId } = useLocalSearchParams();
-  const task = developerTasks.find(t => t.id === taskId);
+  const task = developerTasks.find((t) => t.id === taskId);
 
+  // Handle multiple-choice, output, completion
   const handleAnswer = (index) => {
     if (index === task.correctIndex) {
-      Alert.alert("✅ Correct!", "Well done.");
+      Alert.alert('✅ Correct!', 'Well done.');
     } else {
-      Alert.alert("❌ Incorrect", "Try again.");
+      Alert.alert('❌ Incorrect', 'Try again.');
     }
   };
+
+  // Arrange mode
+  const [order, setOrder] = useState(task?.shuffled ?? []);
+  if (task?.type === 'arrange') {
+    const checkOrder = () => {
+      const correct = order.every((line, i) => line === task.lines[i]);
+      Alert.alert(correct ? '✅ Correct!' : '❌ Incorrect');
+    };
+    return (
+      <View style={styles.arrangeContainer}>
+        <Text style={styles.title}>{task.title}</Text>
+        <DraggableFlatList
+          data={order}
+          keyExtractor={(item) => item}
+          onDragEnd={({ data }) => setOrder(data)}
+          activationDistance={10}
+          renderItem={({ item, drag, isActive }) => (
+            <TouchableOpacity
+              style={[
+                styles.arrangeItem,
+                isActive && { backgroundColor: '#ddd' }
+              ]}
+              onLongPress={drag}
+            >
+              <Text style={styles.arrangeText}>{item}</Text>
+            </TouchableOpacity>
+          )}
+        />
+        <TouchableOpacity style={styles.checkButton} onPress={checkOrder}>
+          <Text style={styles.checkText}>Preveri vrstni red</Text>
+        </TouchableOpacity>
+      </View>
+    );
+  }
 
   if (!task) {
     return (
@@ -24,14 +84,37 @@ export default function TaskDetail() {
     );
   }
 
+  // Default modes: multiple-choice, output, completion
+  const { width } = Dimensions.get('window');
+  const codeBoxHeight = 200;
   return (
-    <ScrollView contentContainerStyle={styles.container}>
+    <View style={styles.defaultContainer}>
       <Text style={styles.title}>{task.title}</Text>
-      <Text style={styles.difficulty}>Difficulty: {task.difficulty}</Text>
-      <View style={styles.codeBox}>
-        <Text style={styles.code}>{task.question}</Text>
-      </View>
-      {task.options.map((opt, index) => (
+      {task.difficulty != null && (
+        <Text style={styles.difficulty}>Difficulty: {task.difficulty}</Text>
+      )}
+      {task.type === 'output' ? (
+        <View style={[styles.codeBox, { width: width - 40, height: codeBoxHeight }]}> 
+          <WebView
+            originWhitelist={['*']}
+            source={{ html: htmlTemplate(task.question) }}
+            scrollEnabled={false}
+            showsVerticalScrollIndicator={false}
+            style={{ backgroundColor: 'transparent' }}
+          />
+        </View>
+      ) : (
+        <View style={[styles.codeBox, { width: width - 40, height: codeBoxHeight }]}> 
+          <WebView
+            originWhitelist={['*']}
+            source={{ html: htmlTemplate(task.question) }}
+            scrollEnabled={false}
+            showsVerticalScrollIndicator={false}
+            style={{ backgroundColor: 'transparent' }}
+          />
+        </View>
+      )}
+      {task.options?.map((opt, index) => (
         <TouchableOpacity
           key={index}
           style={styles.optionButton}
@@ -40,45 +123,65 @@ export default function TaskDetail() {
           <Text style={styles.optionText}>{opt}</Text>
         </TouchableOpacity>
       ))}
-    </ScrollView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
+  arrangeContainer: {
+    flex: 1,
     padding: 20,
-    backgroundColor: COLORS.white,
-    minHeight: '100%',
+    backgroundColor: COLORS.white
+  },
+  defaultContainer: {
+    flex: 1,
+    padding: 20,
+    backgroundColor: COLORS.white
   },
   title: {
     fontSize: 24,
     fontWeight: 'bold',
     marginBottom: 10,
-    color: COLORS.black,
+    color: COLORS.black
   },
   difficulty: {
     marginBottom: 10,
     fontSize: 16,
-    color: COLORS.gray,
+    color: COLORS.gray
   },
   codeBox: {
-    backgroundColor: '#f0f0f0',
-    padding: 12,
-    borderRadius: 8,
     marginBottom: 20,
-  },
-  code: {
-    fontFamily: 'monospace',
-    color: '#333',
+    borderRadius: 8,
+    overflow: 'hidden'
   },
   optionButton: {
     backgroundColor: COLORS.black,
     padding: 12,
     borderRadius: 8,
-    marginVertical: 6,
+    marginVertical: 6
   },
   optionText: {
     color: 'white',
-    fontSize: 16,
+    fontSize: 16
+  },
+  arrangeItem: {
+    padding: 16,
+    marginVertical: 6,
+    backgroundColor: '#f0f0f0',
+    borderRadius: 6
+  },
+  arrangeText: {
+    fontFamily: 'monospace'
+  },
+  checkButton: {
+    marginTop: 20,
+    padding: 14,
+    backgroundColor: COLORS.black,
+    borderRadius: 8,
+    alignItems: 'center'
+  },
+  checkText: {
+    color: 'white',
+    fontWeight: '600'
   }
 });

@@ -1,4 +1,4 @@
-import { View, Text } from 'react-native';
+// app/(tabs)/_layout.jsx
 import React from 'react';
 import { Tabs } from 'expo-router';
 import Ionicons from '@expo/vector-icons/Ionicons';
@@ -6,65 +6,88 @@ import { COLORS } from '../../constants/Colors';
 
 export default function TabLayout() {
   return (
-    <Tabs 
+    <Tabs
       screenOptions={{
-        headerShown:false,
+        headerShown: false,
         tabBarActiveTintColor: COLORS.activeIcon,
       }}
     >
-      <Tabs.Screen name="home"
+      {/* Main tabs */}
+      <Tabs.Screen
+        name="home"
         options={{
           tabBarLabel: 'Home',
           tabBarIcon: ({ color }) => <Ionicons name="home" size={24} color={color} />,
         }}
       />
-      <Tabs.Screen name="explore"
+      <Tabs.Screen
+        name="explore"
         options={{
           tabBarLabel: 'Explore',
           tabBarIcon: ({ color }) => <Ionicons name="search" size={24} color={color} />,
         }}
       />
-      <Tabs.Screen name="profile"
+      <Tabs.Screen
+        name="profile"
         options={{
           tabBarLabel: 'Profile',
           tabBarIcon: ({ color }) => <Ionicons name="person" size={24} color={color} />,
         }}
       />
 
-      {/* Hidden job detail route - uses tabBarItemStyle to drop the slot entirely*/}
-      <Tabs.Screen
-        name="job/[jobId]/index"
-        options={{
-          headerShown: false,
-          // hide from tab bar
-          tabBarItemStyle: { display: 'none' },
-        }}
-      />
-      <Tabs.Screen
-        name="job/[jobId]/quiz"
-        options={{
-          headerShown: false,
-          tabBarItemStyle: { display: 'none' },
-        }}
-      />
-      {/* Uncomment when ready:
-      <Tabs.Screen name="job/[jobId]/game" options={{ headerShown: true, tabBarButton: () => null }} />
-      */}
-
+      {/* Developer routes (hidden) */}
       <Tabs.Screen
         name="job/Developer/index"
-        options={{ headerShown: false, tabBarItemStyle: { display: 'none' } }}
+        options={{ tabBarItemStyle: { display: 'none' } }}
       />
       <Tabs.Screen
         name="job/Developer/quiz"
-        options={{ headerShown: false, tabBarItemStyle: { display: 'none' } }}
+        options={{ tabBarItemStyle: { display: 'none' } }}
       />
       <Tabs.Screen
-        name="job/Developer/game"
-        options={{ headerShown: false, tabBarItemStyle: { display: 'none' } }}
+        name="job/Developer/game/index"
+        options={{ tabBarItemStyle: { display: 'none' } }}
+      />
+      <Tabs.Screen
+        name="job/Developer/game/[taskId]"
+        options={{ tabBarItemStyle: { display: 'none' } }}
       />
 
+      {/* Emergency Medicine Specialist (SpecUrgMed) routes (hidden) */}
+      <Tabs.Screen
+        name="job/SpecUrgMed/index"
+        options={{ tabBarItemStyle: { display: 'none' } }}
+      />
+      <Tabs.Screen
+        name="job/SpecUrgMed/quiz"
+        options={{ tabBarItemStyle: { display: 'none' } }}
+      />
+      <Tabs.Screen
+        name="job/SpecUrgMed/game/index"
+        options={{ tabBarItemStyle: { display: 'none' } }}
+      />
+      <Tabs.Screen
+        name="job/SpecUrgMed/game/[scenarioId]"
+        options={{ tabBarItemStyle: { display: 'none' } }}
+      />
 
+      {/* Catch-all generic job/[jobId] routes (hidden), if you still need them */}
+      <Tabs.Screen
+        name="job/[jobId]/index"
+        options={{ tabBarItemStyle: { display: 'none' } }}
+      />
+      <Tabs.Screen
+        name="job/[jobId]/quiz"
+        options={{ tabBarItemStyle: { display: 'none' } }}
+      />
+      <Tabs.Screen
+        name="job/[jobId]/game/index"
+        options={{ tabBarItemStyle: { display: 'none' } }}
+      />
+      <Tabs.Screen
+        name="job/[jobId]/game/[…]"
+        options={{ tabBarItemStyle: { display: 'none' } }}
+      />
     </Tabs>
   );
 }

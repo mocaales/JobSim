@@ -1,22 +1,25 @@
-// components/Explore/Developer.jsx
+// components/Explore/SpecUrgMed.jsx
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { TouchableOpacity, Text, StyleSheet } from 'react-native';
 import { useRouter } from 'expo-router';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import { COLORS } from '../../constants/Colors';
 
-export default function Developer() {
+export default function SpecUrgMed() {
   const router = useRouter();
 
   return (
-    <TouchableOpacity style={styles.card} onPress={() => router.push('/job/Developer')}>
+    <TouchableOpacity
+      style={styles.card}
+      onPress={() => router.push('/job/SpecUrgMed')}
+    >
       <MaterialCommunityIcons
-        name="laptop"
+        name="heart-pulse"
         size={40}
         color={COLORS.activeIcon}
         style={styles.icon}
       />
-      <Text style={styles.title}>Junior Developer</Text>
+      <Text style={styles.title}>Emergency Medicine Specialist</Text>
     </TouchableOpacity>
   );
 }

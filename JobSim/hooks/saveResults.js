@@ -1,6 +1,9 @@
+import Constants from 'expo-constants';
 import axios from 'axios';
 
-const API_URL = `${process.env.EXPO_PUBLIC_API_URL}/api/results`;
+// read base API URL from expoConfig.extra
+const BASE = Constants.expoConfig.extra.apiUrl;
+const API_URL = `${BASE}/results`;
 
 export const saveResult = async (data) => {
   try {

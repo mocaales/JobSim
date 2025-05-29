@@ -40,6 +40,7 @@
       "typedRoutes": true
     },
     "extra": {
+      "apiUrl": "http://10.0.2.2:5000/api/users",
       "router": {},
       "eas": {
         "projectId": "2f34bcce-844b-47a9-9a92-b3ddef9e4bf2"

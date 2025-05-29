@@ -1,6 +1,7 @@
 export const developerTasks = [
   {
     id: '1',
+    type: 'multiple-choice',
     title: 'Fix variable scope',
     difficulty: 1,
     question: `function greet() {\n  if (true) {\n    var message = "Hello";\n  }\n  console.log(message);\n}`,
@@ -14,6 +15,7 @@ export const developerTasks = [
   },
   {
     id: '2',
+    type: 'multiple-choice',
     title: 'Fix return type',
     difficulty: 1,
     question: `function add(a, b) {\n  console.log(a + b);\n}`,
@@ -27,6 +29,7 @@ export const developerTasks = [
   },
   {
     id: '3',
+    type: 'multiple-choice',
     title: 'Fix infinite loop',
     difficulty: 2,
     question: `let i = 0;\nwhile (i < 10) {\n  console.log(i);\n}`,
@@ -40,6 +43,7 @@ export const developerTasks = [
   },
   {
     id: '4',
+    type: 'multiple-choice',
     title: 'Fix undefined error',
     difficulty: 2,
     question: `function printName(user) {\n  console.log(user.name);\n}\nprintName();`,
@@ -53,6 +57,7 @@ export const developerTasks = [
   },
   {
     id: '5',
+    type: 'multiple-choice',
     title: 'Fix array access',
     difficulty: 1,
     question: `const arr = [1, 2, 3];\nconsole.log(arr[3]);`,
@@ -66,6 +71,7 @@ export const developerTasks = [
   },
   {
     id: '6',
+    type: 'multiple-choice',
     title: 'Fix object mutation',
     difficulty: 2,
     question: `const user = { name: "Luka" };\nuser = { name: "Ana" };`,
@@ -79,6 +85,7 @@ export const developerTasks = [
   },
   {
     id: '7',
+    type: 'multiple-choice',
     title: 'Fix async issue',
     difficulty: 3,
     question: `function fetchData() {\n  const data = fetch("api/data");\n  console.log(data);\n}`,
@@ -92,6 +99,7 @@ export const developerTasks = [
   },
   {
     id: '8',
+    type: 'multiple-choice',
     title: 'Fix missing dependency',
     difficulty: 3,
     question: `useEffect(() => {\n  console.log(count);\n});`,
@@ -105,6 +113,7 @@ export const developerTasks = [
   },
   {
     id: '9',
+    type: 'multiple-choice',
     title: 'Fix state update',
     difficulty: 2,
     question: `const [count, setCount] = useState(0);\nsetCount = 5;`,
@@ -118,6 +127,7 @@ export const developerTasks = [
   },
   {
     id: '10',
+    type: 'multiple-choice',
     title: 'Fix missing import',
     difficulty: 2,
     question: `console.log(moment().format());`,
@@ -165,5 +175,3 @@ export const developerTasks = [
     correctIndex: 1
   }
 ];
-
-

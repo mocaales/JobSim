@@ -1,7 +1,8 @@
 import { View, Text, Image, StyleSheet } from 'react-native';
 import React, { useEffect } from 'react';
-import { useUser } from '@clerk/clerk-expo';
+import Constants from 'expo-constants';
 import axios from 'axios';
+import { useUser } from '@clerk/clerk-expo';
 import { useUserStore } from '../../storage/UserStorrage';
 
 const styles = StyleSheet.create({
@@ -26,7 +27,10 @@ const styles = StyleSheet.create({
 export default function UserInfo() {
   const { user } = useUser();
   const setUserEmail = useUserStore((state) => state.setUserEmail);
-  console.log('📡 API URL:', process.env.EXPO_PUBLIC_API_URL);
+
+  // read base API URL from expoConfig.extra
+  const BASE = Constants.expoConfig.extra.apiUrl;
+  console.log('📡 API URL:', BASE);
 
   useEffect(() => {
     const email = user?.primaryEmailAddress?.emailAddress;
@@ -35,9 +39,10 @@ export default function UserInfo() {
 
       const saveUser = async () => {
         try {
-          await axios.post(`${process.env.EXPO_PUBLIC_API_URL}/api/users`, {
-            email,
-          });
+          await axios.post(
+            `${BASE}/users`,
+            { email }
+          );
         } catch (err) {
           console.error('❌ Error saving user:', err);
         }

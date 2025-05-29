@@ -4,6 +4,7 @@ import { FontAwesome } from '@expo/vector-icons';
 import Cashier from '../../components/Explore/Cashier';
 import Dispatcher from '../../components/Explore/Dispatcher';
 import Developer from '../../components/Explore/Developer';
+import SpecUrgMed from '../../components/Explore/SpecUrgMed';
 import Chef from '../../components/Explore/Chef';
 
 export default function Explore() {
@@ -69,6 +70,7 @@ export default function Explore() {
         renderItem={({ item }) => item.component}
         contentContainerStyle={styles.listContainer}
       />
+      <SpecUrgMed />
     </View>
   );
 }
