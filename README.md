@@ -65,7 +65,7 @@ pip install -r requirements.txt
 
 # 4. Ustvari .env datoteko in dodaj MongoDB URL
 touch .env
-MONGO_URL=mongodb+srv://username:password@cluster.mongodb.net/job_sim_db?retryWrites=true&w=majority
+MONGO_URL=<yourmongoconnection>
 
 # 5. Zaženi backend
 uvicorn app.main:app --reload --port 8000
