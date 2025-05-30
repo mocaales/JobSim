@@ -1,13 +1,18 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, Platform, SafeAreaView } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, SafeAreaView, ActivityIndicator } from 'react-native';
 import { useRouter } from 'expo-router';
 import { COLORS } from '../../constants/Colors';
+import { useUser } from '@clerk/clerk-expo';
 
 export default function Questionnaire() {
   const [answers, setAnswers] = useState({});
   const [current, setCurrent] = useState(0);
   const [submitted, setSubmitted] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [skipCheck, setSkipCheck] = useState(false);
   const router = useRouter();
+  const { user } = useUser();
+  const email = user?.primaryEmailAddress?.emailAddress;
 
   const questions = [
     { id: 1, text: 'Do you enjoy solving technical problems?', type: 'scale' },
@@ -35,30 +40,118 @@ export default function Questionnaire() {
     { id: 23, text: 'I prefer making decisions rather than following instructions.', type: 'scale' },
   ];
 
+  useEffect(() => {
+    const checkExisting = async () => {
+      if (!email) {
+        Alert.alert("Error", "Email not found.");
+        router.push('/home');
+        return;
+      }
+
+      try {
+        const response = await fetch('https://1579-93-103-129-225.ngrok-free.app/check_existing', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email })
+        });
+        const data = await response.json();
+        if (data.exists) {
+          Alert.alert(
+            "You already submitted the questionnaire",
+            `Your previous result was: ${data.result}\nDo you want to submit new answers?`,
+            [
+              { text: "Cancel", onPress: () => router.push('/home'), style: 'cancel' },
+              { text: "Yes", onPress: () => { setSkipCheck(true); setLoading(false); } }
+            ]
+          );
+        } else {
+          setLoading(false);
+        }
+      } catch (err) {
+        Alert.alert("Error", "Failed to check previous result.");
+        router.push('/home');
+      }
+    };
+
+    checkExisting();
+  }, []);
+
   const handleAnswer = (value) => {
-    setAnswers(prev => ({ ...prev, [questions[current].id]: value }));
+    const question = questions[current];
+    setAnswers(prev => ({ ...prev, [question.id]: value }));
   };
 
-  const handleSubmit = () => {
-    console.log('Answers:', answers);
-    setSubmitted(true);
+  const validateInput = (question, ans) => {
+    if (question.type === 'scale') {
+      const num = parseInt(ans, 10);
+      return !(isNaN(num) || num < 1 || num > 10);
+    } else if (question.type === 'yesno') {
+      return ans === 'Yes' || ans === 'No';
+    }
+    return false;
+  };
+
+  const submitAnswers = async () => {
+    const mappedAnswers = questions.map(q => {
+      const ans = answers[q.id];
+      return q.type === 'yesno' ? (ans === 'Yes' ? 1 : 0) : parseInt(ans) || 0;
+    });
+
+    try {
+      const response = await fetch('https://1579-93-103-129-225.ngrok-free.app/predict', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          answers: mappedAnswers,
+          email: email,
+          force: skipCheck
+        })
+      });
+      const data = await response.json();
+
+      if (data.message) {
+        Alert.alert(
+          "Questionnaire Already Submitted",
+          `${data.message}\nPrevious result: ${data.result}\n\nDo you want to submit new answers?`,
+          [
+            { text: "Cancel", style: "cancel" },
+            { text: "Yes", onPress: () => { setSkipCheck(true); submitAnswers(); } }
+          ]
+        );
+      } else {
+        Alert.alert("Prediction Result", `Suggested Profession: ${data.predicted_profession}`);
+        setSubmitted(true);
+      }
+
+    } catch (error) {
+      Alert.alert("Error", "Failed to submit answers.");
+    }
   };
 
   const nextQuestion = () => {
-    if (!answers[questions[current].id]) {
-      Alert.alert('Please answer the question before proceeding.');
+    const ans = answers[questions[current].id];
+    if (!ans) {
+      Alert.alert('Please answer the question.');
+      return;
+    }
+    if (!validateInput(questions[current], ans)) {
+      Alert.alert('Invalid Input', questions[current].type === 'scale' ? 'Enter a number between 1-10.' : 'Choose Yes or No.');
       return;
     }
     if (current < questions.length - 1) {
       setCurrent(current + 1);
     } else {
-      handleSubmit();
+      submitAnswers();
     }
   };
 
   const prevQuestion = () => {
     if (current > 0) setCurrent(current - 1);
   };
+
+  if (loading) {
+    return <View style={styles.safe}><ActivityIndicator size="large" color={COLORS.activeIcon} /></View>;
+  }
 
   return (
     <SafeAreaView style={styles.safe}>
@@ -79,19 +172,13 @@ export default function Questionnaire() {
             ) : (
               <View style={styles.yesnoRow}>
                 <TouchableOpacity 
-                  style={[
-                    styles.yesnoButton, 
-                    answers[questions[current].id] === 'Yes' && styles.selectedButton
-                  ]}
+                  style={[styles.yesnoButton, answers[questions[current].id] === 'Yes' && styles.selectedButton]}
                   onPress={() => handleAnswer('Yes')}
                 >
                   <Text style={styles.yesnoText}>Yes</Text>
                 </TouchableOpacity>
                 <TouchableOpacity 
-                  style={[
-                    styles.yesnoButton, 
-                    answers[questions[current].id] === 'No' && styles.selectedButton
-                  ]}
+                  style={[styles.yesnoButton, answers[questions[current].id] === 'No' && styles.selectedButton]}
                   onPress={() => handleAnswer('No')}
                 >
                   <Text style={styles.yesnoText}>No</Text>
@@ -114,7 +201,6 @@ export default function Questionnaire() {
         ) : (
           <View style={styles.resultBox}>
             <Text style={styles.resultText}>🎉 Thank you for completing the questionnaire!</Text>
-            <Text style={styles.resultText}>Your answers have been saved for processing.</Text>
           </View>
         )}
       </View>

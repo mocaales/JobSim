@@ -45,3 +45,22 @@ app-example
 
 expo-env.d.ts
 # @end expo-cli
+
+vprasanja_za_kviz
+
+# Python
+__pycache__/
+*.py[cod]
+*.so
+
+# Virtual environments
+venv/
+env/
+
+# Environment variables
+.env
+
+# Models
+app/models/*.pkl
+
+simulated_responses.csv
