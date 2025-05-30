@@ -49,7 +49,7 @@ export default function Questionnaire() {
       }
 
       try {
-        const response = await fetch('https://1579-93-103-129-225.ngrok-free.app/check_existing', {
+        const response = await fetch(`${process.env.EXPO_PUBLIC_API_URL}/check_existing`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ email })
@@ -98,7 +98,7 @@ export default function Questionnaire() {
     });
 
     try {
-      const response = await fetch('https://1579-93-103-129-225.ngrok-free.app/predict', {
+      const response = await fetch(`${process.env.EXPO_PUBLIC_API_URL}/predict`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
