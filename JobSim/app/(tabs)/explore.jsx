@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, TextInput, Text, FlatList, TouchableOpacity, StyleSheet, Platform } from 'react-native';
+import { View, TextInput, Text, FlatList, TouchableOpacity, StyleSheet, Platform, ScrollView } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
 import Cashier from '../../components/Explore/Cashier';
 import Dispatcher from '../../components/Explore/Dispatcher';
@@ -12,11 +12,11 @@ export default function Explore() {
   const [filter, setFilter] = useState('all');
 
   const allJobs = [
-    { name: 'Cashier', component: <Cashier />, category: 'Service' },
-    { name: 'Dispatcher', component: <Dispatcher />, category: 'People Skills' },
-    { name: 'Junior Developer', component: <Developer />, category: 'Tech' },
-    { name: 'Chef', component: <Chef />, category: 'Service' },
-    // lejko je se npr za creative, logistics, healthcare
+    { name: 'Cashier', component: <Cashier />, category: 'Business & Administration' },
+    { name: 'Dispatcher', component: <Dispatcher />, category: 'Business & Administration' },
+    { name: 'Junior Developer', component: <Developer />, category: 'IT & Tech' },
+    { name: 'Chef', component: <Chef />, category: 'Hospitality & Tourism' },
+    { name: 'Emergency Medicine Specialist', component: <SpecUrgMed />, category: 'Healthcare & Social Work' },
   ];
 
   const filteredJobs = allJobs.filter(job =>
@@ -26,7 +26,7 @@ export default function Explore() {
 
   return (
     <View style={styles.container}>
-      {/* Search Bar with Icon and Clear Button */}
+      {/* Search Bar */}
       <View style={styles.searchBarContainer}>
         <FontAwesome name="search" size={20} color="gray" style={styles.searchIcon} />
         <TextInput
@@ -42,25 +42,31 @@ export default function Explore() {
         )}
       </View>
 
-      {/* Filter Buttons */}
-      <View style={styles.filterContainer}>
-        {['all', 'Tech', 'People Skills', 'Service'].map(category => (
-          <TouchableOpacity
-            key={category}
-            style={[
-              styles.filterButton,
-              filter === category && styles.activeFilter
-            ]}
-            onPress={() => setFilter(category)}
-          >
-            <Text style={[
-              styles.filterText,
-              filter === category && styles.activeFilterText
-            ]}>
-              {category}
-            </Text>
-          </TouchableOpacity>
-        ))}
+      {/* Horizontal Scrollable Filters */}
+      <View style={styles.filterWrapper}>
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.filterContainer}>
+          {['all', 'IT & Tech', 'Hospitality & Tourism', 'Healthcare & Social Work',
+            'Construction & Engineering', 'Business & Administration',
+            'Mechanical & Industrial', 'Education & Science'
+          ].map(category => (
+            <TouchableOpacity
+              key={category}
+              style={[
+                styles.filterButton,
+                filter === category && styles.activeFilter
+              ]}
+              onPress={() => setFilter(category)}
+              activeOpacity={0.7} // da se ohrani velikost na klik
+            >
+              <Text style={[
+                styles.filterText,
+                filter === category && styles.activeFilterText
+              ]}>
+                {category}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </ScrollView>
       </View>
 
       {/* Job List */}
@@ -70,7 +76,6 @@ export default function Explore() {
         renderItem={({ item }) => item.component}
         contentContainerStyle={styles.listContainer}
       />
-      <SpecUrgMed />
     </View>
   );
 }
@@ -78,7 +83,7 @@ export default function Explore() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingTop: Platform.OS === 'ios' ? 60 : 20, 
+    paddingTop: Platform.OS === 'ios' ? 60 : 20,
     backgroundColor: '#fff',
   },
   searchBarContainer: {
@@ -98,19 +103,20 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
 
-  filterContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    marginHorizontal: 10,
+  filterWrapper: {
     marginBottom: 10,
-    flexWrap: 'wrap',
+  },
+  filterContainer: {
+    paddingHorizontal: 10,
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   filterButton: {
     paddingVertical: 8,
     paddingHorizontal: 15,
     backgroundColor: '#e0e0e0',
     borderRadius: 20,
-    margin: 5,
+    marginHorizontal: 5,
   },
   activeFilter: {
     backgroundColor: '#111',
@@ -121,9 +127,9 @@ const styles = StyleSheet.create({
   },
   activeFilterText: {
     color: '#fff',
-    fontWeight: 'bold',
+    fontWeight: '500',
   },
   listContainer: {
-    paddingBottom: 20, 
+    paddingBottom: 20,
   },
 });
