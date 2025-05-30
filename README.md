@@ -73,10 +73,10 @@ uvicorn app.main:app --reload --port 8000
 
 ---
 
-📈 Funkcionalnosti
-	•	Google prijava in avtentikacija (Clerk)
-	•	Simulacija poklicev in kvizi za raziskovanje kariernih poti
-	•	Predikcija poklica z uporabo XGBoost modela
-	•	Shranjevanje in posodabljanje odgovorov uporabnika v MongoDB
-	•	Prikaz rezultatov glede na pretekle vnose
-	•	Obvestilo uporabniku, če je vprašalnik že bil rešen (in možnost ponovnega reševanja)
+## 📈 Funkcionalnosti
+* Google prijava in avtentikacija (Clerk)
+* Simulacija poklicev in kvizi za raziskovanje kariernih poti
+* Predikcija poklica z uporabo XGBoost modela
+* Shranjevanje in posodabljanje odgovorov uporabnika v MongoDB
+* Prikaz rezultatov glede na pretekle vnose
+* Obvestilo uporabniku, če je vprašalnik že bil rešen (in možnost ponovnega reševanja)
