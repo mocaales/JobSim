@@ -1,56 +1,58 @@
 import React, { useState, useEffect } from 'react';
 import {
-  View, Text, SafeAreaView, TouchableOpacity, Modal, StyleSheet, Platform, Animated, Easing,
+  View, Text, SafeAreaView, TouchableOpacity, Modal, StyleSheet, Platform, Alert
 } from 'react-native';
 import { useRouter } from 'expo-router';
+import { useUser } from '@clerk/clerk-expo';
 import { COLORS } from '../../../constants/Colors';
 
 const regularItems = [
-  { name: 'Steak', price: 5.8 }, { name: 'Apple', price: 1 }, { name: 'Broccoli', price: 1.3 },
-  { name: 'Lettuce', price: 1.1 }, { name: 'Bread', price: 2.5 }, { name: 'Milk', price: 1.2 },
-  { name: 'Eggs', price: 3 }, { name: 'Chicken', price: 4.5 }, { name: 'Pizza', price: 15 },
-  { name: 'Burger', price: 12 }, { name: 'Sandwich', price: 5 }, { name: 'Wrap', price: 6 },
-  { name: 'Taco', price: 7 }, { name: 'Pancakes', price: 8 }, { name: 'Salmon', price: 20 },
-  { name: 'Lamb Chops', price: 30 }, { name: 'Pork Roast', price: 25 }, { name: 'Cheddar Cheese', price: 4 },
-  { name: 'Yogurt', price: 2 }, { name: 'Olives', price: 3 }, { name: 'Breadsticks', price: 2 },
-  { name: 'Chocolate Cake', price: 10 }, { name: 'Baguette', price: 2 }, { name: 'Butter', price: 2 },
-  { name: 'Ice Cream', price: 5 }, { name: 'Fruits', price: 6 }, { name: 'Juice', price: 3 },
-  { name: 'Ham', price: 15 }, { name: 'Salad', price: 4 }, { name: 'Soup', price: 8 },
-  { name: 'Cheese Platter', price: 25 }, { name: 'Bottle of Wine', price: 40 }, { name: 'Shrimp', price: 30 },
-  { name: 'Crab Legs', price: 50 }, { name: 'Whole Turkey', price: 60 }, { name: 'Vegetable Mix', price: 1.3 },
-  { name: 'Fruit Salad', price: 4.6 }, { name: 'Bread Loaf', price: 2.4 }, { name: 'Pastry', price: 3.2 },
-  { name: 'Cereal', price: 2.8 }, { name: 'Granola Bar', price: 2 }, { name: 'Rice', price: 1.9 },
-  { name: 'Pasta', price: 2.2 }, { name: 'Sauce', price: 2 }, { name: 'Spices', price: 1.4 },
-  { name: 'Herbs', price: 1.6 }, { name: 'Nuts', price: 3 }, { name: 'Seeds', price: 2.3 },
-  { name: 'Beans', price: 1.7 }, { name: 'Lentils', price: 1.9 }, { name: 'Chickpeas', price: 2.1 },
-  { name: 'Tofu', price: 3.2 }, { name: 'Tempeh', price: 4.5 }, { name: 'Quinoa', price: 3.8 },
-  { name: 'Couscous', price: 2.5 }, { name: 'Polenta', price: 2.0 }, { name: 'Oats', price: 1.6 },
+ { name: 'Steak', price: 5.8 }, { name: 'Apple', price: 1 }, { name: 'Broccoli', price: 1.3 },
+ { name: 'Lettuce', price: 1.1 }, { name: 'Bread', price: 2.5 }, { name: 'Milk', price: 1.2 },
+ { name: 'Eggs', price: 3 }, { name: 'Chicken', price: 4.5 }, { name: 'Pizza', price: 15 },
+ { name: 'Burger', price: 12 }, { name: 'Sandwich', price: 5 }, { name: 'Wrap', price: 6 },
+ { name: 'Taco', price: 7 }, { name: 'Pancakes', price: 8 }, { name: 'Salmon', price: 20 },
+ { name: 'Lamb Chops', price: 30 }, { name: 'Pork Roast', price: 25 }, { name: 'Cheddar Cheese', price: 4 },
+ { name: 'Yogurt', price: 2 }, { name: 'Olives', price: 3 }, { name: 'Breadsticks', price: 2 },
+ { name: 'Chocolate Cake', price: 10 }, { name: 'Baguette', price: 2 }, { name: 'Butter', price: 2 },
+ { name: 'Ice Cream', price: 5 }, { name: 'Fruits', price: 6 }, { name: 'Juice', price: 3 },
+ { name: 'Ham', price: 15 }, { name: 'Salad', price: 4 }, { name: 'Soup', price: 8 },
+ { name: 'Cheese Platter', price: 25 }, { name: 'Bottle of Wine', price: 40 }, { name: 'Shrimp', price: 30 },
+ { name: 'Crab Legs', price: 50 }, { name: 'Whole Turkey', price: 60 }, { name: 'Vegetable Mix', price: 1.3 },
+ { name: 'Fruit Salad', price: 4.6 }, { name: 'Bread Loaf', price: 2.4 }, { name: 'Pastry', price: 3.2 },
+ { name: 'Cereal', price: 2.8 }, { name: 'Granola Bar', price: 2 }, { name: 'Rice', price: 1.9 },
+ { name: 'Pasta', price: 2.2 }, { name: 'Sauce', price: 2 }, { name: 'Spices', price: 1.4 },
+ { name: 'Herbs', price: 1.6 }, { name: 'Nuts', price: 3 }, { name: 'Seeds', price: 2.3 },
+ { name: 'Beans', price: 1.7 }, { name: 'Lentils', price: 1.9 }, { name: 'Chickpeas', price: 2.1 },
+ { name: 'Tofu', price: 3.2 }, { name: 'Tempeh', price: 4.5 }, { name: 'Quinoa', price: 3.8 },
+ { name: 'Couscous', price: 2.5 }, { name: 'Polenta', price: 2.0 }, { name: 'Oats', price: 1.6 },
 ];
 
 const nonRoundedItems = [
-  { name: 'Chili', price: 1.99 }, { name: 'Avocado', price: 2.79 }, { name: 'Mango', price: 3.49 },
-  { name: 'Blueberry', price: 1.89 }, { name: 'Olive Oil', price: 4.99 }, { name: 'Pineapple', price: 2.69 },
-  { name: 'Special Cheese', price: 15.49 }, { name: 'Organic Salmon', price: 28.79 }, { name: 'Prosciutto', price: 22.59 },
-  { name: 'Black Truffle', price: 55.99 }, { name: 'Premium Wine', price: 59.49 }, { name: 'Exotic Fruit Basket', price: 45.79 },
-  { name: 'Seafood Platter', price: 39.29 }, { name: 'Imported Spices', price: 8.19 }, { name: 'Fancy Chocolate', price: 12.69 },
-  { name: 'Barley', price: 1.82 }, { name: 'Buckwheat', price: 2.41 }, { name: 'Millet', price: 2.16 },
-  { name: 'Farro', price: 3.04 }, { name: 'Rye Bread', price: 2.69 }, { name: 'Sourdough Bread', price: 3.58 },
-  { name: 'Bagel', price: 1.97 }, { name: 'Croissant', price: 2.79 }, { name: 'Danish Pastry', price: 3.38 },
-  { name: 'Cinnamon Roll', price: 2.89 }, { name: 'Biscotti', price: 1.59 }, { name: 'Granola', price: 4.26 },
-  { name: 'Muesli', price: 3.81 }, { name: 'Rice Cakes', price: 1.63 }, { name: 'Pita Bread', price: 1.44 },
-  { name: 'Naan Bread', price: 2.24 }, { name: 'Tortilla', price: 1.73 }, { name: 'Polish Sausage', price: 3.92 },
-  { name: 'Chorizo', price: 4.55 }, { name: 'Salami', price: 3.66 }, { name: 'Pepperoni', price: 2.89 },
-  { name: 'Bacon', price: 5.02 }, { name: 'Prosciutto Ham', price: 6.51 }, { name: 'Serrano Ham', price: 7.26 },
-  { name: 'Capicola', price: 4.81 }, { name: 'Pastrami', price: 5.53 }, { name: 'Corned Beef', price: 6.02 },
-  { name: 'Duck Breast', price: 8.02 }, { name: 'Lamb Shank', price: 9.56 }, { name: 'Beef Tenderloin', price: 12.08 },
-  { name: 'Pork Belly', price: 7.56 }, { name: 'Rabbit', price: 10.02 }, { name: 'Venison Steak', price: 15.03 },
-  { name: 'Wild Boar Sausage', price: 11.02 }, { name: 'Bison Burger', price: 13.01 }, { name: 'Elk Steak', price: 14.07 },
+ { name: 'Chili', price: 1.99 }, { name: 'Avocado', price: 2.79 }, { name: 'Mango', price: 3.49 },
+ { name: 'Blueberry', price: 1.89 }, { name: 'Olive Oil', price: 4.99 }, { name: 'Pineapple', price: 2.69 },
+ { name: 'Special Cheese', price: 15.49 }, { name: 'Organic Salmon', price: 28.79 }, { name: 'Prosciutto', price: 22.59 },
+ { name: 'Black Truffle', price: 55.99 }, { name: 'Premium Wine', price: 59.49 }, { name: 'Exotic Fruit Basket', price: 45.79 },
+ { name: 'Seafood Platter', price: 39.29 }, { name: 'Imported Spices', price: 8.19 }, { name: 'Fancy Chocolate', price: 12.69 },
+ { name: 'Barley', price: 1.82 }, { name: 'Buckwheat', price: 2.41 }, { name: 'Millet', price: 2.16 },
+ { name: 'Farro', price: 3.04 }, { name: 'Rye Bread', price: 2.69 }, { name: 'Sourdough Bread', price: 3.58 },
+ { name: 'Bagel', price: 1.97 }, { name: 'Croissant', price: 2.79 }, { name: 'Danish Pastry', price: 3.38 },
+ { name: 'Cinnamon Roll', price: 2.89 }, { name: 'Biscotti', price: 1.59 }, { name: 'Granola', price: 4.26 },
+ { name: 'Muesli', price: 3.81 }, { name: 'Rice Cakes', price: 1.63 }, { name: 'Pita Bread', price: 1.44 },
+ { name: 'Naan Bread', price: 2.24 }, { name: 'Tortilla', price: 1.73 }, { name: 'Polish Sausage', price: 3.92 },
+ { name: 'Chorizo', price: 4.55 }, { name: 'Salami', price: 3.66 }, { name: 'Pepperoni', price: 2.89 },
+ { name: 'Bacon', price: 5.02 }, { name: 'Prosciutto Ham', price: 6.51 }, { name: 'Serrano Ham', price: 7.26 },
+ { name: 'Capicola', price: 4.81 }, { name: 'Pastrami', price: 5.53 }, { name: 'Corned Beef', price: 6.02 },
+ { name: 'Duck Breast', price: 8.02 }, { name: 'Lamb Shank', price: 9.56 }, { name: 'Beef Tenderloin', price: 12.08 },
+ { name: 'Pork Belly', price: 7.56 }, { name: 'Rabbit', price: 10.02 }, { name: 'Venison Steak', price: 15.03 },
+ { name: 'Wild Boar Sausage', price: 11.02 }, { name: 'Bison Burger', price: 13.01 }, { name: 'Elk Steak', price: 14.07 },
 ];
 
 const COINS = [0.01, 0.02, 0.05, 0.1, 0.2, 0.5, 1, 2, 5, 10, 20, 50];
 
 export default function CashierGame() {
   const router = useRouter();
+  const { user } = useUser();
   const [showIntro, setShowIntro] = useState(true);
   const [difficulty, setDifficulty] = useState('medium');
   const [round, setRound] = useState(1);
@@ -78,7 +80,6 @@ export default function CashierGame() {
 
   const generateBillItems = () => {
     let selected = [];
-
     if (difficulty === 'easy') {
       selected = Array.from({ length: 3 }, () => regularItems[Math.floor(Math.random() * regularItems.length)]);
     } else if (difficulty === 'medium') {
@@ -89,7 +90,6 @@ export default function CashierGame() {
       selected.push(nonRoundedItems[Math.floor(Math.random() * nonRoundedItems.length)]);
       while (selected.length < 3) selected.push(regularItems[Math.floor(Math.random() * regularItems.length)]);
     }
-
     return selected;
   };
 
@@ -131,10 +131,39 @@ export default function CashierGame() {
       setShowResult(false);
       if (success && correctCount + 1 >= 10) {
         setGameOver(true);
+        saveResult();
       } else if (success) {
         setRound((r) => r + 1);
       }
     }, 1500);
+  };
+
+  const saveResult = async () => {
+    const email = user?.primaryEmailAddress?.emailAddress;
+    if (!email) return;
+
+    try {
+      const response = await fetch(process.env.EXPO_PUBLIC_API_URL + '/cashier/submit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, time: elapsedTime, difficulty }),
+      });
+
+      const data = await response.json();
+
+      if (data.message.includes("updated")) {
+        Alert.alert("🎉 Well done!", "New record! 🏆");
+      } else if (data.message.includes("faster")) {
+        Alert.alert("😔 Shame!", "You can go faster! Try again!");
+      } else if (data.message.includes("New result saved")) {
+        Alert.alert("🔥 First time!", "Score saved successfully!");
+      } else {
+        Alert.alert("ℹ️ Info", data.message);
+      }
+
+    } catch (error) {
+      console.error('Error saving result:', error);
+    }
   };
 
   const finishGame = () => {
@@ -144,6 +173,7 @@ export default function CashierGame() {
 
   const getCoinStyle = (value) => value <= 0.05 ? { ...styles.coin, ...styles.bronzeCoin } :
                                    value <= 2 ? { ...styles.coin, ...styles.goldCoin } : { ...styles.coin, ...styles.bill };
+
 
   if (showIntro) {
     return (
