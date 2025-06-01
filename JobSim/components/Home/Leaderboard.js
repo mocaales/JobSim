@@ -2,40 +2,54 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, FlatList, StyleSheet } from 'react-native';
 import DropDownPicker from 'react-native-dropdown-picker';
 import { COLORS } from '../../constants/Colors';
+import recipes from '../../data/recipes';
+
 
 const availableGames = [
   { label: 'Cashier', value: 'cashier' },
-  { label: 'OtherGame1', value: 'x' },
-  { label: 'OtherGame2', value: 'y' }
+  { label: 'Chef', value: 'chef' }
 ];
 
-const difficulties = [
-  { label: 'All', value: '' },
+const cashierDifficulties = [
   { label: 'Easy', value: 'easy' },
   { label: 'Medium', value: 'medium' },
   { label: 'Hard', value: 'hard' }
 ];
 
+const chefRecipes = recipes.map(recipe => ({
+  label: recipe.title,
+  value: recipe.title
+}));
+
 export default function Leaderboard({ game = 'cashier' }) {
   const [leaderboard, setLeaderboard] = useState([]);
   const [selectedGame, setSelectedGame] = useState(game);
-  const [difficulty, setDifficulty] = useState('');
+  const [filterValue, setFilterValue] = useState('');
 
   const [gameOpen, setGameOpen] = useState(false);
-  const [diffOpen, setDiffOpen] = useState(false);
+  const [filterOpen, setFilterOpen] = useState(false);
 
   useEffect(() => {
     fetchLeaderboard();
-  }, [selectedGame, difficulty]);
+  }, [selectedGame, filterValue]);
 
   const fetchLeaderboard = async () => {
     try {
-      const response = await fetch(`${process.env.EXPO_PUBLIC_API_URL}/${selectedGame}/leaderboard${difficulty ? `?difficulty=${difficulty}` : ''}`);
+      const queryParam = selectedGame === 'cashier'
+        ? `&difficulty=${filterValue}`
+        : `&recipe=${filterValue}`;
+      const response = await fetch(
+        `${process.env.EXPO_PUBLIC_API_URL}/game/leaderboard?game=${selectedGame}${filterValue ? queryParam : ''}`
+      );
       const data = await response.json();
       setLeaderboard(data);
     } catch (err) {
       console.error('Error fetching leaderboard:', err);
     }
+  };
+
+  const getFilterOptions = () => {
+    return selectedGame === 'cashier' ? cashierDifficulties : chefRecipes;
   };
 
   const renderHeaderRow = () => (
@@ -50,13 +64,13 @@ export default function Leaderboard({ game = 'cashier' }) {
     <View style={styles.row}>
       <Text style={[styles.cell, styles.rankCell]}>{index + 1}</Text>
       <Text style={[styles.cell, styles.emailCell]}>{item.email}</Text>
-      <Text style={[styles.cell, styles.timeCell]}>{item.time}s ({item.difficulty})</Text>
+      <Text style={[styles.cell, styles.timeCell]}>{item.time}s</Text>
     </View>
   );
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>🏆 Games Leaderboard 🏆 </Text>
+      <Text style={styles.title}>🏆 Games Leaderboard 🏆</Text>
       <View style={styles.dropdownContainer}>
         <DropDownPicker
           open={gameOpen}
@@ -71,12 +85,12 @@ export default function Leaderboard({ game = 'cashier' }) {
           textStyle={styles.dropdownText}
         />
         <DropDownPicker
-          open={diffOpen}
-          value={difficulty}
-          items={difficulties}
-          setOpen={setDiffOpen}
-          setValue={setDifficulty}
-          placeholder="Select Difficulty"
+          open={filterOpen}
+          value={filterValue}
+          items={getFilterOptions()}
+          setOpen={setFilterOpen}
+          setValue={setFilterValue}
+          placeholder={selectedGame === 'cashier' ? 'Select Difficulty' : 'Select Recipe'}
           containerStyle={styles.dropdownBox}
           style={styles.dropdown}
           dropDownContainerStyle={styles.dropdownList}

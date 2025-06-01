@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { SafeAreaView, View, Text, TouchableOpacity, StyleSheet, Alert, ScrollView, Modal, Dimensions, TouchableWithoutFeedback } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
+import { useUser } from '@clerk/clerk-expo';
 import recipes from '../../../data/recipes';
 import DraggableFlatList from 'react-native-draggable-flatlist';
 import { COLORS } from '../../../constants/Colors';
@@ -11,6 +12,7 @@ const { width, height } = Dimensions.get('window');
 export default function ChefGame() {
   const { recipeId } = useLocalSearchParams();
   const router = useRouter();
+  const { user } = useUser();
 
   if (!recipeId) {
     return (
@@ -55,17 +57,17 @@ export default function ChefGame() {
     setShuffledSteps(shuffled.map((step, index) => ({ key: String(index), text: step })));
   
     const id = setInterval(() => {
-      setPlayTime(prev => prev + 1000);  // 1s vsakih 1000ms
+      setPlayTime(prev => prev + 1000);
     }, 1000);
     setIntervalId(id);
   };
-  
+
   const toggleCheat = () => {
     setCheatVisible(true);
-    setPlayTime(prev => prev + 5000);  // +5s
+    setPlayTime(prev => prev + 5000);
     setTimeout(() => setCheatVisible(false), 15000);
   };
-  
+
   const submitAnswer = () => {
     const userOrder = shuffledSteps.map(s => s.text);
     const correctOrder = recipe.steps;
@@ -75,9 +77,38 @@ export default function ChefGame() {
       setShowResult(true);
       clearInterval(intervalId);
       setGameStarted(false);
+      saveResult();
     } else {
       Alert.alert('❌ Wrong!', 'Try again...');
-      setPlayTime(prev => prev + 10000);  // +10s
+      setPlayTime(prev => prev + 10000);
+    }
+  };
+
+  const saveResult = async () => {
+    const email = user?.primaryEmailAddress?.emailAddress;
+    if (!email) return;
+  
+    try {
+      const response = await fetch(process.env.EXPO_PUBLIC_API_URL + '/game/submit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, time: playTime / 1000, game: 'chef', recipe: recipe.title }),
+      });
+  
+      const data = await response.json();
+  
+      if (data.message.includes("updated")) {
+        Alert.alert("🎉 Well done!", "New record! 🏆");
+      } else if (data.message.includes("faster")) {
+        Alert.alert("😔 Shame!", "You can go faster! Try again!");
+      } else if (data.message.includes("New result saved")) {
+        Alert.alert("🔥 First time!", "Score saved successfully!");
+      } else {
+        Alert.alert("ℹ️ Info", data.message);
+      }
+  
+    } catch (error) {
+      console.error('Error saving result:', error);
     }
   };
 
@@ -146,7 +177,6 @@ export default function ChefGame() {
             <Text style={styles.buttonText}>Submit</Text>
           </TouchableOpacity>
 
-          {/* Modal with outside click to close */}
           <Modal visible={cheatVisible} transparent animationType="fade">
             <TouchableWithoutFeedback onPress={() => setCheatVisible(false)}>
               <View style={styles.modalBackground}>

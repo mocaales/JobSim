@@ -141,16 +141,16 @@ export default function CashierGame() {
   const saveResult = async () => {
     const email = user?.primaryEmailAddress?.emailAddress;
     if (!email) return;
-
+  
     try {
-      const response = await fetch(process.env.EXPO_PUBLIC_API_URL + '/cashier/submit', {
+      const response = await fetch(process.env.EXPO_PUBLIC_API_URL + '/game/submit', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, time: elapsedTime, difficulty }),
+        body: JSON.stringify({ email, time: elapsedTime, difficulty, game: 'cashier' }),
       });
-
+  
       const data = await response.json();
-
+  
       if (data.message.includes("updated")) {
         Alert.alert("🎉 Well done!", "New record! 🏆");
       } else if (data.message.includes("faster")) {
@@ -158,9 +158,8 @@ export default function CashierGame() {
       } else if (data.message.includes("New result saved")) {
         Alert.alert("🔥 First time!", "Score saved successfully!");
       } else {
-        Alert.alert("ℹ️ Info", data.message);
+        Alert.alert("Info", data.message);
       }
-
     } catch (error) {
       console.error('Error saving result:', error);
     }
