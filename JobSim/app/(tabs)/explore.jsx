@@ -15,31 +15,31 @@ export default function Explore() {
   {
     name: 'Cashier',
     component: <Cashier />,
-    category: 'Service',
+    category: 'Business & Administration',
     keywords: ['cashier', 'register', 'sales', 'money', 'store', 'checkout', 'shop', 'retail', 'payment', 'POS']
   },
   {
     name: 'Dispatcher',
     component: <Dispatcher />,
-    category: 'People Skills',
+    category: 'Coordination',
     keywords: ['dispatcher', 'radio', 'logistics', 'communication', 'route', 'emergency', 'coordination', 'operator', 'calls', 'control']
   },
   {
     name: 'Junior Developer',
     component: <Developer />,
-    category: 'Tech',
+    category: 'IT & Tech',
     keywords: ['developer', 'programming', 'code', 'software', 'javascript', 'frontend', 'engineer', 'web', 'react', 'junior']
   },
   {
     name: 'Chef',
     component: <Chef />,
-    category: 'Service',
+    category: 'Hospitality & Tourism',
     keywords: ['chef', 'cook', 'kitchen', 'food', 'culinary', 'restaurant', 'menu', 'meal', 'bake', 'chop']
   },
   {
     name: 'Emergency Medicine Specialist',
     component: <SpecUrgMed />,
-    category: 'Service',
+    category: 'Healthcare & Social Work',
     keywords: ['emergency', 'medicine', 'ER', 'trauma', 'urgent', 'resuscitation', 'doctor', 'hospital', 'care', 'acute']
   }
 ];
@@ -75,9 +75,7 @@ export default function Explore() {
       {/* Horizontal Scrollable Filters */}
       <View style={styles.filterWrapper}>
         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.filterContainer}>
-          {['all', 'IT & Tech', 'Hospitality & Tourism', 'Healthcare & Social Work',
-            'Construction & Engineering', 'Business & Administration',
-            'Mechanical & Industrial', 'Education & Science'
+          {['all', 'IT & Tech', 'Hospitality & Tourism', 'Healthcare & Social Work', 'Business & Administration'
           ].map(category => (
             <TouchableOpacity
               key={category}
