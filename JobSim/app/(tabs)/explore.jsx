@@ -12,17 +12,47 @@ export default function Explore() {
   const [filter, setFilter] = useState('all');
 
   const allJobs = [
-    { name: 'Cashier', component: <Cashier />, category: 'Business & Administration' },
-    { name: 'Dispatcher', component: <Dispatcher />, category: 'Business & Administration' },
-    { name: 'Junior Developer', component: <Developer />, category: 'IT & Tech' },
-    { name: 'Chef', component: <Chef />, category: 'Hospitality & Tourism' },
-    { name: 'Emergency Medicine Specialist', component: <SpecUrgMed />, category: 'Healthcare & Social Work' },
-  ];
+  {
+    name: 'Cashier',
+    component: <Cashier />,
+    category: 'Service',
+    keywords: ['cashier', 'register', 'sales', 'money', 'store', 'checkout', 'shop', 'retail', 'payment', 'POS']
+  },
+  {
+    name: 'Dispatcher',
+    component: <Dispatcher />,
+    category: 'People Skills',
+    keywords: ['dispatcher', 'radio', 'logistics', 'communication', 'route', 'emergency', 'coordination', 'operator', 'calls', 'control']
+  },
+  {
+    name: 'Junior Developer',
+    component: <Developer />,
+    category: 'Tech',
+    keywords: ['developer', 'programming', 'code', 'software', 'javascript', 'frontend', 'engineer', 'web', 'react', 'junior']
+  },
+  {
+    name: 'Chef',
+    component: <Chef />,
+    category: 'Service',
+    keywords: ['chef', 'cook', 'kitchen', 'food', 'culinary', 'restaurant', 'menu', 'meal', 'bake', 'chop']
+  },
+  {
+    name: 'Emergency Medicine Specialist',
+    component: <SpecUrgMed />,
+    category: 'Service',
+    keywords: ['emergency', 'medicine', 'ER', 'trauma', 'urgent', 'resuscitation', 'doctor', 'hospital', 'care', 'acute']
+  }
+];
+
 
   const filteredJobs = allJobs.filter(job =>
-    (filter === 'all' || job.category === filter) &&
-    job.name.toLowerCase().includes(search.toLowerCase())
-  );
+  (filter === 'all' || job.category === filter) &&
+  (
+    job.name.toLowerCase().includes(search.toLowerCase()) ||
+    job.keywords.some(kw => kw.toLowerCase().includes(search.toLowerCase()))
+  )
+);
+
 
   return (
     <View style={styles.container}>
