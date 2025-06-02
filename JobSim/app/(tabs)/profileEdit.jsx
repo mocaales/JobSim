@@ -128,7 +128,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     paddingHorizontal: 24,
-    paddingTop: 40,
+    paddingTop: Platform.OS === 'ios' ? 60 : 40,
   },
   avatar: {
     width: 100,

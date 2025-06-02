@@ -9,7 +9,7 @@ export default function ChefScreen() {
   return (
     <SafeAreaView style={styles.safe}>
       <ScrollView contentContainerStyle={styles.content}>
-        <Text style={styles.header}>👩‍🍳 Chef</Text>
+        <Text style={styles.header}>Chef</Text>
         <Text style={styles.description}>Prepare delicious recipes and challenge your memory and skills!</Text>
 
         <Text style={styles.subheader}>Requirements</Text>

@@ -1,9 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, FlatList, StyleSheet } from 'react-native';
+import { View, Text, FlatList, StyleSheet, ScrollView } from 'react-native';
 import DropDownPicker from 'react-native-dropdown-picker';
 import { COLORS } from '../../constants/Colors';
 import recipes from '../../data/recipes';
-
 
 const availableGames = [
   { label: 'Cashier', value: 'cashier' },
@@ -25,7 +24,6 @@ export default function Leaderboard({ game = 'cashier' }) {
   const [leaderboard, setLeaderboard] = useState([]);
   const [selectedGame, setSelectedGame] = useState(game);
   const [filterValue, setFilterValue] = useState('');
-
   const [gameOpen, setGameOpen] = useState(false);
   const [filterOpen, setFilterOpen] = useState(false);
 
@@ -98,17 +96,20 @@ export default function Leaderboard({ game = 'cashier' }) {
         />
       </View>
       {renderHeaderRow()}
-      <FlatList
-        data={leaderboard}
-        keyExtractor={(item, index) => index.toString()}
-        renderItem={renderItem}
-      />
+      <View style={styles.scrollContainer}>
+        <FlatList
+          data={leaderboard}
+          keyExtractor={(item, index) => index.toString()}
+          renderItem={renderItem}
+          showsVerticalScrollIndicator={true}
+        />
+      </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 20, backgroundColor: '#f9f9f9', borderRadius: 12, marginHorizontal: 16, marginTop: 30, shadowColor: '#000', shadowOpacity: 0.1, shadowRadius: 6, elevation: 3 },
+  container: { flex: 1, padding: 20, backgroundColor: '#fff', borderRadius: 12, marginHorizontal: 16, marginTop: 30, shadowColor: '#000', shadowOpacity: 0.1, shadowRadius: 6, elevation: 3 },
   title: { fontSize: 24, fontWeight: 'bold', textAlign: 'center', marginBottom: 10 },
   dropdownContainer: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 10 },
   dropdownBox: { width: '48%' },
@@ -121,4 +122,5 @@ const styles = StyleSheet.create({
   rankCell: { width: 30, fontWeight: 'bold', textAlign: 'center' },
   emailCell: { flex: 1, textAlign: 'left' },
   timeCell: { width: 120, textAlign: 'right' },
+  scrollContainer: {maxHeight: 250}
 });

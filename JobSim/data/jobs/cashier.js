@@ -1,6 +1,6 @@
 export default {
-    title: 'Salesperson',
-    description: `A salesperson helps customers in stores, processes purchases, handles returns, and keeps the shelves organized. They are often the first point of contact and represent the company directly.`,
+    title: 'Cashier',
+    description: `A cashier helps customers in stores, processes purchases, handles returns, and keeps the shelves organized. They are often the first point of contact and represent the company directly.`,
     requirements: [
       'Communication and interpersonal skills',
       'Basic math and money handling',

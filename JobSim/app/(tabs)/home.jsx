@@ -1,11 +1,10 @@
-import { View, FlatList, StyleSheet, Text } from 'react-native';
+import { View, FlatList, StyleSheet, Text, SafeAreaView } from 'react-native';
 import React, { useState } from 'react';
-import Header from '../../components/Home/Header';
+import { useUser } from '@clerk/clerk-expo';
+import DropDownPicker from 'react-native-dropdown-picker';
 import QuestionnaireCard from '../../components/Home/QuestionnaireCard';
 import Leaderboard from '../../components/Home/Leaderboard';
 import DonutChart from '../../components/Home/DonutChart';
-import { useUser } from '@clerk/clerk-expo';
-import DropDownPicker from 'react-native-dropdown-picker';
 
 export default function Home() {
   const { user } = useUser();
@@ -23,50 +22,88 @@ export default function Home() {
   ]);
 
   return (
-    <View style={{ flex: 1 }}>
-      <FlatList
-        ListHeaderComponent={
-          <>
-            <Header />
-            <QuestionnaireCard />
-            <Leaderboard game='cashier' />
+    <SafeAreaView style={{ flex: 1, backgroundColor: '#3c3c3c' }}>
+      <View style={styles.headerContainer}>
+        <View style={styles.bubble}>
+          <View style={styles.circle} />
+          <View style={styles.textContainer}>
+            <Text style={styles.welcomeText}>Welcome</Text>
+            <Text style={styles.userText}>{user?.fullName || ''}</Text>
+          </View>
+        </View>
+      </View>
 
-            {email && (
-              <View style={styles.chartBox}>
-                <View style={styles.dropdownContainer}>
-                  <DropDownPicker
-                    open={dropdownOpen}
-                    value={selectedJob}
-                    items={jobOptions}
-                    setOpen={setDropdownOpen}
-                    setValue={setSelectedJob}
-                    setItems={setJobOptions}
-                    placeholder="Select Job"
-                    containerStyle={styles.dropdownBox}
-                    style={styles.dropdown}
-                    dropDownContainerStyle={styles.dropdownList}
-                    textStyle={styles.dropdownText}
-                    maxHeight={250}
-                    zIndex={3000}
-                    zIndexInverse={1000}
-                  />
-                </View>
-                <DonutChart email={email} selectedJob={selectedJob} />
+      <View style={{ flex: 1, backgroundColor: '#fff' }}>
+        <FlatList
+          ListHeaderComponent={
+            <>
+              <QuestionnaireCard />
+              <View style={{ zIndex: 5000, elevation: 1000 }}>
+                <Leaderboard game='cashier' />
               </View>
-            )}
 
-            <View style={{ height: 20 }} />
-          </>
-        }
-        data={[]}
-        renderItem={null}
-        style={{ zIndex: 0 }}
-      />
-    </View>
+              {email && (
+                <View style={styles.chartBox}>
+                  <View style={styles.dropdownContainer}>
+                    <DropDownPicker
+                      open={dropdownOpen}
+                      value={selectedJob}
+                      items={jobOptions}
+                      setOpen={setDropdownOpen}
+                      setValue={setSelectedJob}
+                      setItems={setJobOptions}
+                      placeholder="Select Job"
+                      containerStyle={styles.dropdownBox}
+                      style={styles.dropdown}
+                      dropDownContainerStyle={styles.dropdownList}
+                      textStyle={styles.dropdownText}
+                      maxHeight={250}
+                      zIndex={4000}
+                      zIndexInverse={1000}
+                    />
+                  </View>
+                  <DonutChart email={email} selectedJob={selectedJob} />
+                </View>
+              )}
+
+              <View style={{ height: 20 }} />
+            </>
+          }
+          data={[]}
+          renderItem={null}
+        />
+      </View>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
+  headerContainer: {
+    backgroundColor: '#3c3c3c',
+    padding: 20,
+  },
+  bubble: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#fff',
+    borderRadius: 30,
+    paddingVertical: 10,
+    paddingHorizontal: 15,
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowRadius: 6,
+    elevation: 3,
+  },
+  circle: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    backgroundColor: '#000',
+    marginRight: 12,
+  },
+  textContainer: { flexDirection: 'column' },
+  welcomeText: { fontSize: 14, color: '#3c3c3c' },
+  userText: { fontSize: 18, fontWeight: '600', color: '#000' },
   chartBox: {
     backgroundColor: '#fff',
     borderRadius: 16,
@@ -76,24 +113,17 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 10,
     elevation: 5,
-    position: 'relative', 
-    zIndex: 0,
   },
   dropdownContainer: {
     position: 'absolute',
     top: 12,
     right: 16,
     width: 150,
-    zIndex: 3000,
+    zIndex: 4000,
     elevation: 1000,
   },
   dropdownBox: { height: 40 },
   dropdown: { backgroundColor: '#fff', borderColor: '#ccc', borderRadius: 10 },
-  dropdownList: {
-    backgroundColor: '#fff',
-    borderRadius: 10,
-    maxHeight: 250,
-    zIndex: 3000,
-  },
+  dropdownList: { backgroundColor: '#fff', borderRadius: 10, maxHeight: 250 },
   dropdownText: { fontSize: 16, color: "#111" },
 });
