@@ -54,51 +54,55 @@ export default function DonutChart({ email, selectedJob }) {
       <Text style={styles.title}>📊 Quiz Performance</Text>
       <View style={styles.chartRow}>
         <PieChart
-          widthAndHeight={widthAndHeight}
-          series={series}
-          coverRadius={0.7}
-          coverFill={'#fff'}
+            widthAndHeight={widthAndHeight}
+            series={series}
+            coverRadius={0.7}
+            coverFill={'#fff'}
         />
         <View style={styles.percentageSection}>
-          <Text style={styles.jobLabel}>{selectedJob === 'all' ? 'All Quizzes' : `${selectedJob} Quiz`}</Text>
-          <Text style={styles.percentage}>{Math.round(animatedValueNumber)}%</Text>
-          <Text style={styles.subLabel}>Your Success Rate</Text>
+            <Text style={styles.jobLabel}>{selectedJob === 'all' ? 'All Quizzes' : `${selectedJob} Quiz`}</Text>
+            <Text style={styles.percentage}>{Math.round(animatedValueNumber)}%</Text>
+            <Text style={styles.subLabel}>Your Success Rate</Text>
         </View>
-      </View>
+        </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  title: {
-    fontSize: 18,
-    fontWeight: '700',
-    textAlign: 'center',
-    marginBottom: 12,
-  },
-  chartRow: {
-    flexDirection: 'row',
-    alignItems: 'flex-end',
-    justifyContent: 'space-between',
-  },
-  percentageSection: {
-    alignItems: 'flex-end',
-    justifyContent: 'flex-end',
-    marginLeft: 16,
-  },
-  jobLabel: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#333',
-  },
-  percentage: {
-    fontSize: 26,
-    fontWeight: 'bold',
-    color: '#FFA500',
-  },
-  subLabel: {
-    fontSize: 14,
-    color: '#333',
-    marginTop: 2,
-  },
-});
+    title: {
+      fontSize: 18,
+      fontWeight: '700',
+      textAlign: 'left',
+      marginBottom: 12,
+    },
+    chartRow: {
+      flexDirection: 'row',
+      alignItems: 'center',  
+      justifyContent: 'space-between',
+    },
+    percentageSection: {
+        alignItems: 'flex-start',
+        justifyContent: 'center',
+        marginLeft: 16,
+        flex: 1,
+        left: 40,
+      },
+      jobLabel: {
+        fontSize: 14,
+        fontWeight: '600',
+        color: '#333',
+        flexWrap: 'wrap', 
+        maxWidth: 120,    
+      },
+    percentage: {
+      fontSize: 26,
+      fontWeight: 'bold',
+      color: '#FFA500',
+    },
+    subLabel: {
+      fontSize: 14,
+      color: '#333',
+      marginTop: 2,
+    },
+  });

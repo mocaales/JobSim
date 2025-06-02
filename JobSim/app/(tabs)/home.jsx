@@ -3,9 +3,9 @@ import React, { useState } from 'react';
 import Header from '../../components/Home/Header';
 import QuestionnaireCard from '../../components/Home/QuestionnaireCard';
 import Leaderboard from '../../components/Home/Leaderboard';
-import DonutChart from '../../components/Home/DonutChart';  
+import DonutChart from '../../components/Home/DonutChart';
 import { useUser } from '@clerk/clerk-expo';
-import DropDownPicker from 'react-native-dropdown-picker';  
+import DropDownPicker from 'react-native-dropdown-picker';
 
 export default function Home() {
   const { user } = useUser();
@@ -17,6 +17,9 @@ export default function Home() {
     { label: 'All', value: 'all' },
     { label: 'Chef', value: 'Chef' },
     { label: 'Cashier', value: 'Cashier' },
+    { label: 'Dispatcher', value: 'Dispatcher' },
+    { label: 'Junior Developer', value: 'Junior Developer' },
+    { label: 'Emergency Medicine Specialist', value: 'Emergency Medicine Specialist' },
   ]);
 
   return (
@@ -36,13 +39,16 @@ export default function Home() {
                     value={selectedJob}
                     items={jobOptions}
                     setOpen={setDropdownOpen}
-                    setValue={(callback) => setSelectedJob(callback(selectedJob))}
+                    setValue={setSelectedJob}
                     setItems={setJobOptions}
                     placeholder="Select Job"
                     containerStyle={styles.dropdownBox}
                     style={styles.dropdown}
                     dropDownContainerStyle={styles.dropdownList}
                     textStyle={styles.dropdownText}
+                    maxHeight={250}
+                    zIndex={3000}
+                    zIndexInverse={1000}
                   />
                 </View>
                 <DonutChart email={email} selectedJob={selectedJob} />
@@ -54,6 +60,7 @@ export default function Home() {
         }
         data={[]}
         renderItem={null}
+        style={{ zIndex: 0 }}
       />
     </View>
   );
@@ -69,17 +76,24 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 10,
     elevation: 5,
-    position: 'relative',
+    position: 'relative', 
+    zIndex: 0,
   },
   dropdownContainer: {
     position: 'absolute',
-    top: 60,
-    right: 10,
+    top: 12,
+    right: 16,
     width: 150,
-    zIndex: 10, 
+    zIndex: 3000,
+    elevation: 1000,
   },
   dropdownBox: { height: 40 },
   dropdown: { backgroundColor: '#fff', borderColor: '#ccc', borderRadius: 10 },
-  dropdownList: { backgroundColor: '#fff', borderRadius: 10 },
+  dropdownList: {
+    backgroundColor: '#fff',
+    borderRadius: 10,
+    maxHeight: 250,
+    zIndex: 3000,
+  },
   dropdownText: { fontSize: 16, color: "#111" },
 });

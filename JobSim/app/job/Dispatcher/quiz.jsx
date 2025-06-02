@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   SafeAreaView,
   View,
@@ -8,12 +8,19 @@ import {
   Dimensions,
 } from 'react-native';
 import { useRouter } from 'expo-router';
+import { useUser } from '@clerk/clerk-expo';
 import { COLORS } from '../../../constants/Colors';
 import job from '../../../data/jobs/dispatcher';
 
 export default function DispatcherQuiz() {
   const router = useRouter();
-  const questions = job.quizQuestions;
+  const { user } = useUser();
+  const email = user?.primaryEmailAddress?.emailAddress;
+
+  const [questions] = useState(() => {
+    const shuffled = [...job.quizQuestions].sort(() => 0.5 - Math.random());
+    return shuffled.slice(0, Math.floor(Math.random() * 5) + 8);
+  });
 
   const [index, setIndex] = useState(0);
   const [score, setScore] = useState(0);
@@ -37,6 +44,30 @@ export default function DispatcherQuiz() {
     }
   };
 
+  useEffect(() => {
+    if (finished && email) {
+      const sendData = async () => {
+        try {
+          const response = await fetch(process.env.EXPO_PUBLIC_API_URL + '/quiz/submit', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              email,
+              job: 'Dispatcher',  
+              score,
+              total: questions.length
+            }),
+          });
+          const data = await response.json();
+          console.log('✅ Result saved:', data);
+        } catch (err) {
+          console.warn('⚠️ Failed to save result:', err);
+        }
+      };
+      sendData();
+    }
+  }, [finished]);
+
   return (
     <SafeAreaView style={styles.safe}>
       {finished ? (
@@ -44,6 +75,9 @@ export default function DispatcherQuiz() {
           <Text style={styles.header}>Zaključen kviz</Text>
           <Text style={styles.score}>
             Rezultat: {score} / {questions.length}
+          </Text>
+          <Text style={styles.score}>
+            Uspešnost: {Math.round((score / questions.length) * 100)}%
           </Text>
           <TouchableOpacity onPress={() => router.back()} style={styles.button}>
             <Text style={styles.buttonText}>Nazaj</Text>
@@ -59,8 +93,7 @@ export default function DispatcherQuiz() {
               key={i}
               style={[
                 styles.option,
-                selected === i &&
-                  (i === current.correctIndex ? styles.correct : styles.wrong),
+                selected === i && (i === current.correctIndex ? styles.correct : styles.wrong),
               ]}
               onPress={() => handleSelect(i)}
             >
@@ -104,7 +137,7 @@ const styles = StyleSheet.create({
   score: {
     fontSize: 18,
     fontWeight: '500',
-    marginBottom: 16,
+    marginBottom: 8,
     color: COLORS.black,
   },
 });

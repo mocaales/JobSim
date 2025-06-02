@@ -1,22 +1,18 @@
 import React, { useEffect, useState } from 'react';
-import {
-  SafeAreaView,
-  View,
-  Text,
-  TouchableOpacity,
-  StyleSheet,
-  Dimensions,
-} from 'react-native';
+import {SafeAreaView,View,Text,TouchableOpacity,StyleSheet,Dimensions,} from 'react-native';
 import { useRouter } from 'expo-router';
 import { useUser } from '@clerk/clerk-expo';
-import { saveResult } from '../../../hooks/saveResults';
 import { COLORS } from '../../../constants/Colors';
-import job from '../../../data/jobs/cashier';
+import job from '../../../data/jobs/cashier';  
 
 export default function CashierQuiz() {
   const router = useRouter();
   const { user } = useUser();
-  const questions = job.quizQuestions;
+
+  const [questions] = useState(() => {
+    const shuffled = [...job.quizQuestions].sort(() => 0.5 - Math.random());
+    return shuffled.slice(0, Math.floor(Math.random() * 5) + 8);
+  });
 
   const [index, setIndex] = useState(0);
   const [score, setScore] = useState(0);
@@ -41,17 +37,23 @@ export default function CashierQuiz() {
   };
 
   useEffect(() => {
-    if (finished) {
+    if (finished && user?.primaryEmailAddress?.emailAddress) {
       const sendData = async () => {
         try {
-          await saveResult({
-            userId: user?.id || 'guest',
-            job: 'Cashier',
-            score,
+          const response = await fetch(process.env.EXPO_PUBLIC_API_URL + '/quiz/submit', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              email: user.primaryEmailAddress.emailAddress,
+              job: 'Cashier',  
+              score,
+              total: questions.length
+            }),
           });
-          console.log('✅ Result saved to backend');
+          const data = await response.json();
+          console.log('✅ Result saved:', data);
         } catch (err) {
-          console.warn('⚠️ Failed to save result');
+          console.warn('⚠️ Failed to save result:', err);
         }
       };
       sendData();
