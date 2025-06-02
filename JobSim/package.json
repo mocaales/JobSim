@@ -43,14 +43,17 @@
     "react-native-dropdown-picker": "^5.4.6",
     "react-native-gesture-handler": "~2.24.0",
     "react-native-maps": "1.20.1",
+    "react-native-pie-chart": "^4.0.1",
     "react-native-reanimated": "~3.17.4",
     "react-native-safe-area-context": "5.4.0",
     "react-native-screens": "~4.10.0",
+    "react-native-svg": "15.11.2",
     "react-native-syntax-highlighter": "^2.1.0",
     "react-native-vector-icons": "^10.2.0",
     "react-native-web": "~0.20.0",
     "react-native-webview": "^13.13.5",
     "react-syntax-highlighter": "^15.6.1",
+    "victory-native": "^41.17.3",
     "zustand": "^5.0.5"
   },
   "devDependencies": {
