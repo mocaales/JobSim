@@ -88,6 +88,18 @@ export default function TabLayout() {
         name="job/[jobId]/game/[…]"
         options={{ tabBarItemStyle: { display: 'none' } }}
       />
+      <Tabs.Screen
+        name="profileEdit"
+        options={{ tabBarItemStyle: { display: 'none' } }}
+      />
+      <Tabs.Screen
+        name="helpPage"
+        options={{ tabBarItemStyle: { display: 'none' } }}
+      />
+      <Tabs.Screen
+        name="settingsPage"
+        options={{ tabBarItemStyle: { display: 'none' } }}
+      />
     </Tabs>
   );
 }

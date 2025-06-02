@@ -3,16 +3,17 @@ import React, { use } from 'react';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { useAuth } from '@clerk/clerk-expo';
-
+import { useRouter } from 'expo-router'; 
 
 export default function MenuList() {
 
     const { signOut } = useAuth();
+    const router = useRouter();
 
   const menuList = [
-    { id: 1, title: 'Profile', iconSet: 'Ionicons', icon: 'person-outline', screen: 'profile' },
-    { id: 2, title: 'Settings', iconSet: 'Ionicons', icon: 'settings-outline', screen: 'settings' },
-    { id: 3, title: 'Help', iconSet: 'Ionicons', icon: 'help-circle-outline', screen: 'help' },
+    { id: 1, title: 'Profile', iconSet: 'Ionicons', icon: 'person-outline', screen: 'profileEdit' },
+    { id: 2, title: 'Settings', iconSet: 'Ionicons', icon: 'settings-outline', screen: 'settingsPage' },
+    { id: 3, title: 'Help', iconSet: 'Ionicons', icon: 'help-circle-outline', screen: 'helpPage' },
     { id: 4, title: 'Logout', iconSet: 'MaterialIcons', icon: 'logout', screen: 'logout' },
   ];
 
