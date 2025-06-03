@@ -21,6 +21,21 @@ export default function GameIndex() {
         >
           <Text style={styles.buttonText}>Begin Appendicitis Case</Text>
         </TouchableOpacity>
+
+        <TouchableOpacity
+          style={[styles.button, { marginTop: 16 }]}
+          onPress={() => router.push('/job/SpecUrgMed/game/chestpain_start')}
+        >
+          <Text style={styles.buttonText}>Begin Chest Pain (STEMI) Case</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={[styles.button, { marginTop: 16 }]}
+          onPress={() => router.push('/job/SpecUrgMed/game/polytrauma_start')}
+        >
+          <Text style={styles.buttonText}>Begin PolyTrauma Case</Text>
+        </TouchableOpacity>
+
       </ScrollView>
     </SafeAreaView>
   );
@@ -37,7 +52,9 @@ const styles = StyleSheet.create({
   button: {
     backgroundColor: COLORS.activeIcon,
     padding: 16,
-    borderRadius: 12
+    borderRadius: 12,
+    minWidth: 220,
+    alignItems: 'center'
   },
   buttonText: {
     color: COLORS.white,
@@ -45,4 +62,3 @@ const styles = StyleSheet.create({
     fontWeight: '600'
   }
 });
-
