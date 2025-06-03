@@ -66,6 +66,7 @@ export default function CashierQuiz() {
         <View style={styles.center}>
           <Text style={styles.header}>Quiz Completed</Text>
           <Text style={styles.score}>Score: {score} / {questions.length}</Text>
+          <Text style={styles.score}>Percentage: {Math.round((score / questions.length) * 100)}%</Text>
           <TouchableOpacity onPress={() => router.back()} style={styles.button}>
             <Text style={styles.buttonText}>Back</Text>
           </TouchableOpacity>

@@ -72,12 +72,12 @@ export default function DispatcherQuiz() {
     <SafeAreaView style={styles.safe}>
       {finished ? (
         <View style={styles.center}>
-          <Text style={styles.header}>Zaključen kviz</Text>
+          <Text style={styles.header}>Quiz completed</Text>
           <Text style={styles.score}>
-            Rezultat: {score} / {questions.length}
+            Score: {score} / {questions.length}
           </Text>
           <Text style={styles.score}>
-            Uspešnost: {Math.round((score / questions.length) * 100)}%
+            Percentage: {Math.round((score / questions.length) * 100)}%
           </Text>
           <TouchableOpacity onPress={() => router.back()} style={styles.button}>
             <Text style={styles.buttonText}>Nazaj</Text>
@@ -105,7 +105,7 @@ export default function DispatcherQuiz() {
             style={[styles.button, { marginTop: 20 }]}
             disabled={selected === null}
           >
-            <Text style={styles.buttonText}>Naprej</Text>
+            <Text style={styles.buttonText}>Next</Text>
           </TouchableOpacity>
         </View>
       )}
