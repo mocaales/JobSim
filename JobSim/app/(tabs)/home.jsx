@@ -1,15 +1,33 @@
-import { View, FlatList, StyleSheet, Text, SafeAreaView } from 'react-native';
-import React, { useState } from 'react';
+// app/(tabs)/home.jsx
+
+import React, { useState, useEffect } from 'react';          // ← added useEffect
+import {
+  View,
+  FlatList,
+  StyleSheet,
+  Text,
+  SafeAreaView,
+  Image,
+  ActivityIndicator,                                        // ← added ActivityIndicator
+} from 'react-native';
 import { useUser } from '@clerk/clerk-expo';
 import DropDownPicker from 'react-native-dropdown-picker';
 import QuestionnaireCard from '../../components/Home/QuestionnaireCard';
 import Leaderboard from '../../components/Home/Leaderboard';
 import DonutChart from '../../components/Home/DonutChart';
+import { COLORS } from '../../constants/Colors';
+import { AVATAR_IMAGES } from '../utils/avatarMap';
 
 export default function Home() {
-  const { user } = useUser();
+  const { user, isLoaded } = useUser();
   const email = user?.primaryEmailAddress?.emailAddress;
 
+  // ── State for nickname + avatarKey from our backend ────────────────────────────
+  const [nickname, setNickname] = useState('');
+  const [avatarKey, setAvatarKey] = useState('avatar1');
+  const [loadingProfile, setLoadingProfile] = useState(true);
+
+  // ── Dropdown state (unchanged) ─────────────────────────────────────────────────
   const [selectedJob, setSelectedJob] = useState('all');
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [jobOptions, setJobOptions] = useState([
@@ -21,14 +39,65 @@ export default function Home() {
     { label: 'Emergency Medicine Specialist', value: 'Emergency Medicine Specialist' },
   ]);
 
+  // ── Fetch /user/{email} on mount or whenever email changes ──────────────────────
+  useEffect(() => {
+    if (!isLoaded || !email) return;
+    setLoadingProfile(true);
+
+    fetch(`${process.env.EXPO_PUBLIC_API_URL}/user/${encodeURIComponent(email)}`)
+      .then(async (resp) => {
+        if (resp.status === 404) {
+          // No document yet → fallback to Clerk’s fullName + default avatar
+          throw new Error('Not found');
+        }
+        if (!resp.ok) {
+          const text = await resp.text();
+          console.error('Error fetching /user/{email}:', resp.status, text);
+          throw new Error('Fetch failed');
+        }
+        return resp.json();
+      })
+      .then((data) => {
+        // data = { email, nickname, imageUrl }  (imageUrl is the avatar key)
+        setNickname(data.nickname || user.fullName || '');
+        if (data.imageUrl && AVATAR_IMAGES[data.imageUrl]) {
+          setAvatarKey(data.imageUrl);
+        } else {
+          setAvatarKey('avatar1');
+        }
+      })
+      .catch(() => {
+        // On 404 or any error, use Clerk’s values + default avatar
+        setNickname(user.fullName || '');
+        setAvatarKey('avatar1');
+      })
+      .finally(() => {
+        setLoadingProfile(false);
+      });
+  }, [isLoaded, email]);
+
+  // ── While waiting for Clerk or our fetch, show a spinner ────────────────────────
+  if (!isLoaded || loadingProfile) {
+    return (
+      <View style={styles.loaderContainer}>
+        <ActivityIndicator size="large" color={COLORS.activeIcon} />
+      </View>
+    );
+  }
+
+  // ── Now render the header with the user’s nickname + avatar image ───────────────
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: '#3c3c3c' }}>
       <View style={styles.headerContainer}>
         <View style={styles.bubble}>
-          <View style={styles.circle} />
+          {/*  Avatar from our local assets (no more black circle) */}
+          <Image
+            source={AVATAR_IMAGES[avatarKey]}
+            style={styles.avatarCircle}
+          />
           <View style={styles.textContainer}>
             <Text style={styles.welcomeText}>Welcome</Text>
-            <Text style={styles.userText}>{user?.fullName || ''}</Text>
+            <Text style={styles.userText}>{nickname}</Text>
           </View>
         </View>
       </View>
@@ -80,6 +149,11 @@ export default function Home() {
 }
 
 const styles = StyleSheet.create({
+  loaderContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
   headerContainer: {
     backgroundColor: '#3c3c3c',
     padding: 20,
@@ -96,16 +170,24 @@ const styles = StyleSheet.create({
     shadowRadius: 6,
     elevation: 3,
   },
-  circle: {
+  avatarCircle: {
     width: 50,
     height: 50,
     borderRadius: 25,
-    backgroundColor: '#000',
     marginRight: 12,
   },
-  textContainer: { flexDirection: 'column' },
-  welcomeText: { fontSize: 14, color: '#3c3c3c' },
-  userText: { fontSize: 18, fontWeight: '600', color: '#000' },
+  textContainer: {
+    flexDirection: 'column',
+  },
+  welcomeText: {
+    fontSize: 14,
+    color: '#3c3c3c',
+  },
+  userText: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#000',
+  },
   chartBox: {
     backgroundColor: '#fff',
     borderRadius: 16,
