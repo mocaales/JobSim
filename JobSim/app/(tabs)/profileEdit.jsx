@@ -1,3 +1,4 @@
+// app/(tabs)/profileEdit.jsx
 
 import React, { useState, useEffect } from 'react';
 import {
@@ -20,30 +21,45 @@ export default function ProfileEdit() {
   const router = useRouter();
   const { user, isLoaded } = useUser();
 
-  const [fullName, setFullName] = useState('');
+  const [nickname, setNickname] = useState('');
   const [avatarUrl, setAvatarUrl] = useState('');
   const [updating, setUpdating] = useState(false);
 
-  // Once Clerk’s user object is ready, prefill the inputs:
+  // Prefill inputs once Clerk’s user object is ready:
   useEffect(() => {
     if (isLoaded && user) {
-      setFullName(user.fullName || '');
+      setNickname(user.fullName || ''); // default copy of Google name
       setAvatarUrl(user.imageUrl || '');
     }
   }, [isLoaded, user]);
 
   const handleSave = async () => {
-    if (!fullName.trim()) {
-      Alert.alert('Validation', 'Full name cannot be empty.');
+    if (!nickname.trim()) {
+      Alert.alert('Validation', 'nickname cannot be empty.');
       return;
     }
     setUpdating(true);
 
     try {
+      // 1) Update Clerk profile
       await user.update({
-        fullName: fullName.trim(),
         profileImageUrl: avatarUrl.trim(),
       });
+
+      // 2) Upsert into our own backend
+      const email = user.primaryEmailAddress?.emailAddress;
+      if (email) {
+        await fetch(`${process.env.EXPO_PUBLIC_API_URL}/user/upsert`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            email,
+            nickname: nickname.trim(),
+            imageUrl: avatarUrl.trim(),
+          }),
+        });
+      }
+
       Alert.alert('Success', 'Profile updated successfully.');
       router.back();
     } catch (err) {
@@ -77,13 +93,13 @@ export default function ProfileEdit() {
           style={styles.avatar}
         />
 
-        {/* Full Name input */}
-        <Text style={styles.label}>Full Name</Text>
+        {/* nickname input */}
+        <Text style={styles.label}>Nickname (for leaderboards)</Text>
         <TextInput
           style={styles.input}
-          value={fullName}
-          onChangeText={setFullName}
-          placeholder="Enter your full name"
+          value={nickname}
+          onChangeText={setNickname}
+          placeholder="Enter your nickname"
         />
 
         {/* Avatar URL input */}

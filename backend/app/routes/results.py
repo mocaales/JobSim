@@ -49,7 +49,12 @@ async def submit_game_result(result: GameResult):
     insert_data = {
         "email": result.email,
         "time": result.time,
-        "game": result.game
+        "game": result.game,
+        # take nickname from users collection, fallback to email
+        #"nickname": (await db.users.find_one(
+        #    {"email": result.email},
+        #    {"nickname": 1}
+        #)).get("nickname", result.email)
     }
     if result.game == "chef":
         insert_data["recipe"] = result.recipe
