@@ -6,6 +6,7 @@ import { WebView } from 'react-native-webview';
 import { useLocalSearchParams } from 'expo-router';
 import { COLORS } from '../../../../constants/Colors';
 import { developerTasks } from '../../../../data/developerTasks';
+import { useUser } from '@clerk/clerk-expo'; 
 
 const htmlTemplate = (code) => `
   <!doctype html>
@@ -30,25 +31,53 @@ const htmlTemplate = (code) => `
 `;
 
 export default function TaskDetail() {
+  const { user } = useUser();
+  const email = user?.primaryEmailAddress?.emailAddress;
   const { taskId } = useLocalSearchParams();
   const task = developerTasks.find((t) => t.id === taskId);
 
-  // Handle multiple-choice, output, completion
-  const handleAnswer = (index) => {
-    if (index === task.correctIndex) {
-      Alert.alert('✅ Correct!', 'Well done.');
-    } else {
-      Alert.alert('❌ Incorrect', 'Try again.');
+  const [startTime] = useState(Date.now());
+
+  const submitDeveloperGameResult = async () => {
+  const timeTaken = Math.floor((Date.now() - startTime) / 1000);
+
+  try {
+      await fetch(`${process.env.EXPO_PUBLIC_API_URL}/game/submit`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email,
+          game: 'junior_developer',
+          time: timeTaken
+        })
+      });
+    } catch (err) {
+      console.error("Failed to submit result", err);
     }
   };
+
+
+  const handleAnswer = async (index) => {
+  const isCorrect = index === task.correctIndex;
+
+  if (isCorrect) {
+    await submitDeveloperGameResult();
+    Alert.alert('✅ Correct!', 'Well done.');
+  } else {
+    Alert.alert('❌ Incorrect', 'Try again.');
+  }
+};
+
+
 
   // Arrange mode
   const [order, setOrder] = useState(task?.shuffled ?? []);
   if (task?.type === 'arrange') {
-    const checkOrder = () => {
-      const correct = order.every((line, i) => line === task.lines[i]);
-      Alert.alert(correct ? '✅ Correct!' : '❌ Incorrect');
-    };
+    const checkOrder = async () => {
+    const correct = order.every((line, i) => line === task.lines[i]);
+    if (correct) await submitDeveloperGameResult();
+    Alert.alert(correct ? '✅ Correct!' : '❌ Incorrect');
+  };
     return (
       <View style={styles.arrangeContainer}>
         <Text style={styles.title}>{task.title}</Text>

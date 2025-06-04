@@ -6,8 +6,13 @@ import recipes from '../../data/recipes';
 
 const availableGames = [
   { label: 'Cashier', value: 'cashier' },
-  { label: 'Chef', value: 'chef' }
+  { label: 'Chef', value: 'chef' },
+  { label: 'Developer', value: 'developer' },
+  { label: 'Dispatcher', value: 'dispatcher' },
+  { label: 'Junior Developer', value: 'junior-developer' },
+  { label: 'Emergency Medicine Specialist', value: 'emergency-medicine-specialist' },
 ];
+
 
 const cashierDifficulties = [
   { label: 'Easy', value: 'easy' },
@@ -47,8 +52,11 @@ export default function Leaderboard({ game = 'cashier' }) {
   };
 
   const getFilterOptions = () => {
-    return selectedGame === 'cashier' ? cashierDifficulties : chefRecipes;
-  };
+  if (selectedGame === 'cashier') return cashierDifficulties;
+  if (selectedGame === 'chef') return chefRecipes;
+  return [];  // ker za druge ni filtrov, torej težavnosti itd...
+};
+
 
   const renderHeaderRow = () => (
     <View style={[styles.row, styles.headerRow]}>
@@ -82,6 +90,7 @@ export default function Leaderboard({ game = 'cashier' }) {
           dropDownContainerStyle={styles.dropdownList}
           textStyle={styles.dropdownText}
         />
+        {getFilterOptions().length > 0 && (
         <DropDownPicker
           open={filterOpen}
           value={filterValue}
@@ -94,6 +103,8 @@ export default function Leaderboard({ game = 'cashier' }) {
           dropDownContainerStyle={styles.dropdownList}
           textStyle={styles.dropdownText}
         />
+      )}
+
       </View>
       {renderHeaderRow()}
       <View style={styles.scrollContainer}>
