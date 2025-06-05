@@ -1,16 +1,22 @@
-import React, { useRef, useEffect } from 'react';
+import React from 'react';
 import {
   View,
   Text,
   StyleSheet,
   TouchableOpacity,
-  SafeAreaView,
-  Animated,
   Dimensions,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import Svg, { Path } from 'react-native-svg';
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withRepeat,
+  withTiming,
+  Easing,
+} from 'react-native-reanimated';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const { width } = Dimensions.get('window');
 const GAP = 20;
@@ -25,33 +31,31 @@ const features = [
 
 export default function ChatHub() {
   const router = useRouter();
-  const waveAnim = useRef(new Animated.Value(0)).current;
+  const insets = useSafeAreaInsets();
+  const waveOffset = useSharedValue(0);
 
-  useEffect(() => {
-    Animated.loop(
-      Animated.sequence([
-        Animated.timing(waveAnim, {
-          toValue: -10,
-          duration: 3000,
-          useNativeDriver: true,
-        }),
-        Animated.timing(waveAnim, {
-          toValue: 10,
-          duration: 3000,
-          useNativeDriver: true,
-        }),
-      ])
-    ).start();
+  React.useEffect(() => {
+    waveOffset.value = withRepeat(
+      withTiming(10, {
+        duration: 3000,
+        easing: Easing.inOut(Easing.sin),
+      }),
+      -1,
+      true
+    );
   }, []);
+
+  const animatedWaveStyle = useAnimatedStyle(() => ({
+    transform: [{ translateY: waveOffset.value }],
+  }));
 
   return (
     <View style={styles.container}>
-      <Animated.View style={[styles.waveContainer, { transform: [{ translateY: waveAnim }] }]}>
+      {/* 🌊 Animated Wave Background */}
+      <Animated.View style={[styles.waveContainer, animatedWaveStyle]}>
         <Svg height="440" width={width} viewBox={`0 0 ${width} 440`}>
           <Path
             fill="#4C5FCB"
-            // 2C3E50, 
-
             d={`
               M0,160 
               Q${width * 0.25},260 ${width * 0.5},240 
@@ -64,7 +68,8 @@ export default function ChatHub() {
         </Svg>
       </Animated.View>
 
-      <SafeAreaView style={styles.safe}>
+      {/* 💡 Main Content below the wave */}
+      <View style={[styles.safe, { paddingTop: insets.top + 140 }]}>
         <Text style={styles.heading}>AI Career Tools</Text>
 
         <View style={styles.grid}>
@@ -82,7 +87,7 @@ export default function ChatHub() {
             </TouchableOpacity>
           ))}
         </View>
-      </SafeAreaView>
+      </View>
     </View>
   );
 }
@@ -101,12 +106,11 @@ const styles = StyleSheet.create({
   },
   safe: {
     flex: 1,
-    paddingTop: 180,
   },
   heading: {
-    fontSize: 28,
+    fontSize: 32,
     fontWeight: '800',
-    color: '#fff',
+    color: '#111827',
     textAlign: 'center',
     marginBottom: 24,
     paddingHorizontal: 24,

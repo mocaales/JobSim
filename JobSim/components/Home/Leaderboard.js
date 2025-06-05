@@ -7,7 +7,7 @@ import recipes from '../../data/recipes';
 const availableGames = [
   { label: 'Cashier', value: 'cashier' },
   { label: 'Chef', value: 'chef' },
-  { label: 'Developer', value: 'developer' },
+  // { label: 'Developer', value: 'developer' },
   { label: 'Dispatcher', value: 'dispatcher' },
   { label: 'Junior Developer', value: 'junior-developer' },
   { label: 'Emergency Medicine Specialist', value: 'emergency-medicine-specialist' },
