@@ -1,4 +1,4 @@
-// app/components/Profile/UserInfo.jsx
+// JobSim/components/profile/UserInfo.jsx
 
 import React, { useEffect, useState } from "react";
 import {
@@ -11,81 +11,71 @@ import {
 } from "react-native";
 import { useUser } from "@clerk/clerk-expo";
 import { useUserStore } from "../../storage/UserStorrage";
-import { AVATAR_IMAGES } from "../../app/utils/avatarMap"; // <-- Adjust path if needed
-import { COLORS } from '../../constants/Colors'; 
+import { AVATAR_IMAGES } from "../../app/utils/avatarMap";
 
 export default function UserInfo() {
   const { user, isLoaded } = useUser();
   const setUserEmail = useUserStore((state) => state.setUserEmail);
 
-  // Track whether we've done the upsert to our backend
-  const [didUpsert, setDidUpsert] = useState(false);
-  const [upserting, setUpserting] = useState(false);
+  // Track whether we've already ensured this user exists in DB:
+  const [didEnsure, setDidEnsure] = useState(false);
+  const [ensuring, setEnsuring] = useState(false);
 
-  // State to hold the fetched profile data from our DB:
+  // State to hold the profile we fetch from MongoDB:
   const [nickname, setNickname] = useState("");
-  const [avatarKey, setAvatarKey] = useState("avatar1"); // default key
+  const [avatarKey, setAvatarKey] = useState("avatar1");
   const [loadingProfile, setLoadingProfile] = useState(true);
 
-  // ─── 1) First Effect: Upsert Clerk data into our backend ─────────────────────────
+  // ─── 1) First Effect: ensure user record exists (but do not overwrite existing) ─────
   useEffect(() => {
     if (!isLoaded || !user) return;
+    const email = user.primaryEmailAddress?.emailAddress;
+    if (!email) return;
 
-    const email = user.primaryEmailAddress?.emailAddress ?? "";
-    const fullName = user.fullName || "";
-    const clerkAvatarUrl = user.imageUrl || "";
-
-    // Store in Zustand for other parts of the app
-    if (email) setUserEmail(email);
-
-    // Only upsert once per session
-    if (!didUpsert && email) {
-      setUpserting(true);
-      fetch(`${process.env.EXPO_PUBLIC_API_URL}/user/upsert`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          email,
-          nickname: fullName,
-          imageUrl: clerkAvatarUrl, // at first, this is a full URL; we’ll overwrite next
-        }),
+    setEnsuring(true);
+    fetch(`${process.env.EXPO_PUBLIC_API_URL}/user/${encodeURIComponent(email)}`)
+      .then((resp) => {
+        if (resp.status === 404) {
+          // Not in DB yet → insert with default avatar1
+          return fetch(`${process.env.EXPO_PUBLIC_API_URL}/user/upsert`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              email,
+              nickname: user.fullName || "",
+              imageUrl: "avatar1",
+            }),
+          });
+        } else {
+          // Already exists, no need to upsert
+          return Promise.resolve(null);
+        }
       })
-        .then(async (resp) => {
-          if (!resp.ok) {
-            const text = await resp.text();
-            console.error("Upsert failed:", resp.status, text);
-            throw new Error(`Status ${resp.status}`);
-          }
-          return resp.json();
-        })
-        .then((data) => {
-          console.log("User upsert response:", data);
-          setDidUpsert(true);
-        })
-        .catch((err) => {
-          console.error("Error upserting user:", err);
-          Alert.alert("Error", "Could not save your profile right now.");
-        })
-        .finally(() => {
-          setUpserting(false);
-        });
-    }
+      .then((upsertResp) => {
+        if (upsertResp && !upsertResp.ok) {
+          const text = upsertResp.text();
+          console.error("Initial upsert failed:", upsertResp.status, text);
+          throw new Error("Initial upsert failed");
+        }
+        setDidEnsure(true);
+      })
+      .catch((err) => {
+        console.error("Error ensuring user record:", err);
+        Alert.alert("Error", "Could not set up your profile right now.");
+      })
+      .finally(() => {
+        setEnsuring(false);
+      });
   }, [isLoaded, user]);
 
-  // ─── 2) Second Effect: Fetch the saved profile (nickname + avatarKey) from DB ────
+  // ─── 2) Second Effect: once user is ensured, fetch their nickname + avatarKey ─────
   useEffect(() => {
-    // Only fetch after Clerk is loaded, user exists, and upsert is done
-    if (!isLoaded || !user || !didUpsert) return;
-
+    if (!isLoaded || !user || !didEnsure) return;
     const email = user.primaryEmailAddress?.emailAddress || "";
     setLoadingProfile(true);
 
     fetch(`${process.env.EXPO_PUBLIC_API_URL}/user/${encodeURIComponent(email)}`)
       .then(async (resp) => {
-        if (resp.status === 404) {
-          // No document yet (unlikely, since we just upserted) → fallback
-          throw new Error("Not found");
-        }
         if (!resp.ok) {
           const text = await resp.text();
           console.error("Error fetching /user/{email}:", resp.status, text);
@@ -94,42 +84,38 @@ export default function UserInfo() {
         return resp.json();
       })
       .then((data) => {
-        // data = { email, nickname, imageUrl }
         setNickname(data.nickname || user.fullName || "");
-        // Here data.imageUrl is either the Clerk URL from first upsert, or an avatar key
-        // If it matches one of our avatar keys, use it; otherwise default to "avatar1"
         if (data.imageUrl && AVATAR_IMAGES[data.imageUrl]) {
           setAvatarKey(data.imageUrl);
         } else {
-          // If profile.imageUrl is still a full URL, we ignore it and default:
           setAvatarKey("avatar1");
         }
       })
-      .catch(() => {
-        // On 404 or any error, fall back to Clerk’s fullName and default avatar
+      .catch((err) => {
+        console.error("Error loading profile:", err);
         setNickname(user.fullName || "");
         setAvatarKey("avatar1");
       })
       .finally(() => {
         setLoadingProfile(false);
       });
-  }, [isLoaded, user, didUpsert]);
+  }, [isLoaded, user, didEnsure]);
 
-  // ─── 3) While upserting or loading profile data, show a spinner ────────────────
-  if (upserting || loadingProfile) {
+  // ─── 3) While ensuring or loading, show a spinner ───────────────────────────────
+  if (ensuring || loadingProfile) {
     return (
       <View style={styles.container}>
-        <ActivityIndicator size="large" color={COLORS.activeIcon} />
+        <ActivityIndicator size="large" color="#555" />
         <Text style={{ marginTop: 10 }}>
-          {upserting
-            ? "Saving your profile…"
+          {ensuring
+            ? "Setting up your profile…"
             : "Loading your profile…"}
         </Text>
       </View>
     );
   }
 
-  // ─── 4) Render the fetched avatar + nickname ───────────────────────────────────
+  // ─── 4) Render the avatar + nickname ─────────────────────────────────────────────
   return (
     <View style={styles.container}>
       <Image source={AVATAR_IMAGES[avatarKey]} style={styles.UserImage} />
