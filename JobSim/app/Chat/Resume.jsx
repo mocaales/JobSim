@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -11,6 +11,7 @@ import {
 import * as DocumentPicker from 'expo-document-picker';
 import { useRouter } from 'expo-router';
 import { useUser } from '@clerk/clerk-expo';
+import { useLocalSearchParams } from 'expo-router';
 
 export default function ResumeAnalyzer() {
   const router = useRouter();
@@ -21,6 +22,25 @@ export default function ResumeAnalyzer() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [evaluation, setEvaluation] = useState(null);
+  const { resume_id } = useLocalSearchParams();
+
+  useEffect(() => {
+    if (resume_id) {
+      fetch(`${process.env.EXPO_PUBLIC_API_URL}/resume/result/${resume_id}`)
+        .then(res => res.json())
+        .then(data => {
+          setEvaluation({
+            score: data.overall_score,
+            sections: data.sections,
+            tips: data.tips,
+            good: data.good,
+            improvements: data.improvements,
+          });
+          setResumeFile({ name: data.filename });
+        })
+        .catch(err => setError("Failed to load resume result"));
+    }
+  }, [resume_id]);
 
   const handlePickDocument = async () => {
     setError(null);
@@ -83,7 +103,7 @@ export default function ResumeAnalyzer() {
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContent}>
-        <Text style={styles.title}>📄 Resume Analyzer</Text>
+        <Text style={styles.title}>Resume Analyzer</Text>
 
         <TouchableOpacity style={styles.uploadButton} onPress={handlePickDocument}>
           <Text style={styles.uploadText}>Upload Resume (PDF)</Text>
@@ -153,7 +173,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   uploadButton: {
-    backgroundColor: '#111',
+    backgroundColor: '#34D399',
     paddingVertical: 12,
     paddingHorizontal: 20,
     borderRadius: 10,

@@ -147,7 +147,7 @@ const styles = StyleSheet.create({
   },
   sendBtn: {
     marginLeft: 8,
-    backgroundColor: '#111',
+    backgroundColor: '#4C8EFF',
     paddingVertical: 12,
     paddingHorizontal: 18,
     borderRadius: 10,
