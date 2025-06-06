@@ -29,3 +29,4 @@ xgboost==3.0.2
 requests==2.31.0
 python-multipart       
 pdfplumber==0.10.4
+catboost>=1.2
