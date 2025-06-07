@@ -39,16 +39,17 @@ export default function TaskDetail() {
   const [startTime] = useState(Date.now());
 
   const submitDeveloperGameResult = async () => {
-  const timeTaken = Math.floor((Date.now() - startTime) / 1000);
-
-  try {
+    const timeTaken = Math.floor((Date.now() - startTime) / 1000);
+    const points = task?.difficulty || 1;
+    try {
       await fetch(`${process.env.EXPO_PUBLIC_API_URL}/game/submit`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           email,
           game: 'junior_developer',
-          time: timeTaken
+          time: timeTaken,
+          points
         })
       });
     } catch (err) {

@@ -35,16 +35,36 @@ export default function ScenarioStep() {
 
   const handleScenarioComplete = async () => {
     if (!email) return;
+    let scenarioName = node.id;
+    if (scenarioName === 'start') scenarioName = 'Abdomen pain';
+    else if (scenarioName === 'chestpain_start') scenarioName = 'Chest pain';
+    else if (scenarioName === 'polytrauma_start') scenarioName = 'Polytrauma';
+
+    
+    const minStepsMap = {
+      'Abdomen pain': 6,
+      'Chest pain': 7,   
+      'Polytrauma': 7
+    };
+    let points = 0;
+    // node.title če najde Success se shrani 10točk +3, če min koraki
+    const isSuccess = node.title?.includes('Success') || node.text?.includes('Appendectomy successful');
+    if (isSuccess) {
+      points = 10;
+      const minSteps = minStepsMap[scenarioName];
+      if (minSteps && visited.length === minSteps) {
+        points += 3;
+      }
+    }
     try {
-      const response = await fetch(process.env.EXPO_PUBLIC_API_URL + '/game/submit', {
+      await fetch(process.env.EXPO_PUBLIC_API_URL + '/game/submit', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           email,
           job: 'Emergency Medicine Specialist',
-          scenario: node.id,
-          visited,
-          flags,
+          scenario: scenarioName,
+          points,
         }),
       });
       const data = await response.json();
