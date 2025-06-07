@@ -4,19 +4,23 @@ import joblib
 import numpy as np
 import pandas as pd
 from app.database import db
+import os
 
 router = APIRouter()
 
-model = joblib.load("app/models/profession_model_catboost.pkl")
-scaler = joblib.load("app/models/scaler.pkl")
-label_encoder = joblib.load("app/models/label_encoder.pkl")
+base_dir = os.path.dirname(os.path.abspath(__file__))
+models_dir = os.path.abspath(os.path.join(base_dir, "..", "models"))
+
+model = joblib.load(os.path.join(models_dir, "profession_model_catboost.pkl"))
+scaler = joblib.load(os.path.join(models_dir, "scaler.pkl"))
+label_encoder = joblib.load(os.path.join(models_dir, "label_encoder.pkl"))
 
 class PredictionRequest(BaseModel):
     answers: list
     email: str
     force: bool = False
 
-# shranjevanje podatkov iz vpralasnika v bazo
+# shranjevanje podatkov iz vprašalnika v bazo
 @router.post("/predict")
 async def predict(request: PredictionRequest):
     if len(request.answers) != 25:
@@ -27,7 +31,10 @@ async def predict(request: PredictionRequest):
     existing = await db.responses.find_one({"email": request.email})
 
     if existing and not request.force:
-        return {"message": "You have already submitted the questionnaire.", "result": existing["predicted_profession"]}
+        return {
+            "message": "You have already submitted the questionnaire.",
+            "result": existing["predicted_profession"]
+        }
 
     columns = [f"Q{i}" for i in range(1, 26)]
     answers = np.array(request.answers).reshape(1, -1)
