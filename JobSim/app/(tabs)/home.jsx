@@ -41,7 +41,7 @@ export default function Home() {
               <View style={{ zIndex: 5000, elevation: 1000 }}>
                 <Leaderboard game='cashier' />
                 <Leaderboard game='developer' />
-                <Leaderboard game='specUrgMed' />
+                <Leaderboard game='emergency_medicine' />
               </View>
 
               {email && (

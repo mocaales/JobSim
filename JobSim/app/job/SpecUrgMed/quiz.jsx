@@ -1,3 +1,4 @@
+// app/job/SpecUrgMed/index.jsx
 import React, { useEffect, useState } from 'react';
 import {
   SafeAreaView,
@@ -131,20 +132,20 @@ export default function SpecUrgMedQuiz() {
     if (finished && email) {
       const sendData = async () => {
         try {
-          const response = await fetch(process.env.EXPO_PUBLIC_API_URL + '/quiz/submit', {
+          const response = await fetch(`${process.env.EXPO_PUBLIC_API_URL}/quiz/submit`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
               email,
-              job: 'Emergency Medicine Specialist', 
+              job: 'Emergency Medicine Specialist',
               score,
-              total: quiz.length 
+              total: quiz.length,
             }),
           });
           const data = await response.json();
-          console.log('✅ Result saved:', data);
+          console.log('✅ Quiz result saved:', data);
         } catch (err) {
-          console.warn('⚠️ Failed to save result:', err);
+          console.warn('⚠️ Failed to save quiz result:', err);
         }
       };
       sendData();
@@ -155,7 +156,7 @@ export default function SpecUrgMedQuiz() {
   const q = quiz[index];
 
   return (
-    <SafeAreaView style={styles.safe}>
+    <SafeAreaView style={styles.safe}>      
       {finished ? (
         <View style={styles.center}>
           <Text style={styles.header}>Quiz Completed</Text>
