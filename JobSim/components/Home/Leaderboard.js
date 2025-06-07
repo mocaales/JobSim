@@ -61,7 +61,7 @@ export default function Leaderboard({ game = 'cashier' }) {
   const renderHeaderRow = () => (
     <View style={[styles.row, styles.headerRow]}>
       <Text style={[styles.cell, styles.rankCell]}>#</Text>
-      <Text style={[styles.cell, styles.emailCell]}>Email</Text>
+      <Text style={[styles.cell, styles.emailCell]}>Nickname</Text>
       <Text style={[styles.cell, styles.timeCell]}>Time</Text>
     </View>
   );
