@@ -931,6 +931,7 @@ export default function DeveloperQuiz() {
           {q.options.map((opt, i) => (
             <TouchableOpacity
               key={i}
+              testID={`option-${i}`}
               style={[
                 styles.option,
                 selected === i && (i === q.correctIndex ? styles.correct : styles.wrong)

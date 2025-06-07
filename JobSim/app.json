@@ -46,6 +46,9 @@
         "projectId": "2f34bcce-844b-47a9-9a92-b3ddef9e4bf2"
       }
     },
-    "owner": "alesmoca8"
+    "owner": "alesmoca8",
+    "assetBundlePatterns": [
+      "**/*"
+    ]
   }
 }
