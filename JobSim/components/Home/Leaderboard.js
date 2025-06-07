@@ -7,7 +7,7 @@ import recipes from '../../data/recipes';
 const availableGames = [
   { label: 'Cashier', value: 'cashier' },
   { label: 'Chef', value: 'chef' },
-  { label: 'Developer', value: 'developer' },
+  // { label: 'Developer', value: 'developer' },
   { label: 'Dispatcher', value: 'dispatcher' },
   { label: 'Junior Developer', value: 'junior-developer' },
   { label: 'Emergency Medicine Specialist', value: 'emergency-medicine-specialist' },
@@ -61,7 +61,7 @@ export default function Leaderboard({ game = 'cashier' }) {
   const renderHeaderRow = () => (
     <View style={[styles.row, styles.headerRow]}>
       <Text style={[styles.cell, styles.rankCell]}>#</Text>
-      <Text style={[styles.cell, styles.emailCell]}>Email</Text>
+      <Text style={[styles.cell, styles.emailCell]}>Nickname</Text>
       <Text style={[styles.cell, styles.timeCell]}>Time</Text>
     </View>
   );
@@ -69,7 +69,7 @@ export default function Leaderboard({ game = 'cashier' }) {
   const renderItem = ({ item, index }) => (
     <View style={styles.row}>
       <Text style={[styles.cell, styles.rankCell]}>{index + 1}</Text>
-      <Text style={[styles.cell, styles.emailCell]}>{item.email}</Text>
+      <Text style={[styles.cell, styles.emailCell]}>{item.nickname || item.email}</Text>
       <Text style={[styles.cell, styles.timeCell]}>{item.time}s</Text>
     </View>
   );

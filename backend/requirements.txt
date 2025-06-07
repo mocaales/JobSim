@@ -26,3 +26,8 @@ typing_extensions==4.13.2
 tzdata==2025.2
 uvicorn==0.34.2
 xgboost==3.0.2
+requests==2.31.0
+python-multipart       
+pdfplumber==0.10.4
+catboost>=1.2
+httpx==0.27.0

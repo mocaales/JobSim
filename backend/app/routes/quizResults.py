@@ -16,7 +16,12 @@ async def submit_quiz_result(result: QuizResult):
     data = {
         "email": result.email,
         "job": result.job,
-        "percentage": percentage
+        "percentage": percentage,
+        # nickname from collection, email as fallback
+        #"nickname": (await db.users.find_one(
+        #    {"email": result.email},
+        #    {"nickname": 1}
+        #)).get("nickname", result.email)
     }
     await db.quiz_results.insert_one(data)
     return {"message": "Quiz result saved", "percentage": percentage}

@@ -7,7 +7,7 @@ from app.database import db
 
 router = APIRouter()
 
-model = joblib.load("app/models/profession_model_xgb.pkl")
+model = joblib.load("app/models/profession_model_catboost.pkl")
 scaler = joblib.load("app/models/scaler.pkl")
 label_encoder = joblib.load("app/models/label_encoder.pkl")
 
@@ -16,19 +16,20 @@ class PredictionRequest(BaseModel):
     email: str
     force: bool = False
 
+# shranjevanje podatkov iz vpralasnika v bazo
 @router.post("/predict")
 async def predict(request: PredictionRequest):
-    if len(request.answers) != 23:
-        return {"error": "Invalid number of answers."}
-    if not all(isinstance(x, (int, float)) for x in request.answers):
-        return {"error": "All answers must be numbers."}
+    if len(request.answers) != 25:
+        return {"error": "Expected 25 answers."}
+    if not all(isinstance(x, (int, float)) and 1 <= x <= 5 for x in request.answers):
+        return {"error": "All answers must be numbers between 1 and 5."}
 
     existing = await db.responses.find_one({"email": request.email})
 
     if existing and not request.force:
         return {"message": "You have already submitted the questionnaire.", "result": existing["predicted_profession"]}
 
-    columns = [f"Q{i}" for i in [5,6,7,11,12,17,1,2,3,4,8,9,10,13,14,15,16,18,19,20,21,22,23]]
+    columns = [f"Q{i}" for i in range(1, 26)]
     answers = np.array(request.answers).reshape(1, -1)
     input_df = pd.DataFrame(answers, columns=columns)
     scaled = scaler.transform(input_df)
@@ -36,12 +37,18 @@ async def predict(request: PredictionRequest):
     profession = label_encoder.inverse_transform(pred)[0]
 
     if existing:
-        await db.responses.update_one({"email": request.email}, {"$set": {"answers": request.answers, "predicted_profession": profession}})
+        await db.responses.update_one(
+            {"email": request.email},
+            {"$set": {"answers": request.answers, "predicted_profession": profession}}
+        )
     else:
-        await db.responses.insert_one({"email": request.email, "answers": request.answers, "predicted_profession": profession})
+        await db.responses.insert_one(
+            {"email": request.email, "answers": request.answers, "predicted_profession": profession}
+        )
 
     return {"predicted_profession": profession}
 
+# preverjanje obstoja odgovora v bazi
 @router.post("/check_existing")
 async def check_existing(data: dict):
     email = data.get("email")

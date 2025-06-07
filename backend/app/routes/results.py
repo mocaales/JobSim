@@ -49,7 +49,12 @@ async def submit_game_result(result: GameResult):
     insert_data = {
         "email": result.email,
         "time": result.time,
-        "game": result.game
+        "game": result.game,
+        # take nickname from users collection, fallback to email
+        #"nickname": (await db.users.find_one(
+        #    {"email": result.email},
+        #    {"nickname": 1}
+        #)).get("nickname", result.email)
     }
     if result.game == "chef":
         insert_data["recipe"] = result.recipe
@@ -75,6 +80,7 @@ async def submit_game_result(result: GameResult):
 
     return {"message": "New result saved 🔥"}
 
+
 @router.get("/game/leaderboard")
 async def get_game_leaderboard(game: str, difficulty: str = None, recipe: str = None):
     query = {"game": game}
@@ -84,4 +90,23 @@ async def get_game_leaderboard(game: str, difficulty: str = None, recipe: str = 
         query["difficulty"] = difficulty
 
     results = await db.games_results.find(query).sort("time", 1).limit(100).to_list(100)
-    return [{"email": r["email"], "time": r["time"], "difficulty": r.get("difficulty"), "recipe": r.get("recipe")} for r in results]
+
+    # Zberi unikatne email naslove
+    emails = list({r["email"] for r in results})
+
+    # Pridobi vse uporabnike z navedenimi emaili
+    users = await db.users.find({"email": {"$in": emails}}, {"email": 1, "nickname": 1}).to_list(None)
+    email_to_nickname = {u["email"]: u["nickname"] for u in users}
+
+    # Dodaj nickname (če obstaja) vsakemu rezultatu
+    enriched_results = []
+    for r in results:
+        enriched_results.append({
+            "email": r["email"],
+            "nickname": email_to_nickname.get(r["email"]),
+            "time": r["time"],
+            "difficulty": r.get("difficulty"),
+            "recipe": r.get("recipe")
+        })
+
+    return enriched_results
