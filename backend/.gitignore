@@ -61,8 +61,4 @@ env/
 .env
 
 # Models
-app/models/*.pkl
-
 simulated_responses.csv
-
-requirements.txt
