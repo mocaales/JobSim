@@ -82,7 +82,7 @@ export default {
   observe: {
     id: 'observe',
     title: 'Observation',
-    text: 'Condition worsened overnight – Motherfucker died!',
+    text: 'Condition worsened overnight – Patient died!',
     options: [],
   },
 

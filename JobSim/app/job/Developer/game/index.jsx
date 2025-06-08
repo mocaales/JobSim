@@ -9,30 +9,37 @@ const MODES = [
   {
     key: 'multiple-choice',
     label: 'Debug\nCode',
-    color: COLORS.primary,
+    color: '#ffb74d', // orange
     size: 100,
     position: { top: 40, left: 30 }
   },
   {
     key: 'output',
     label: 'Predict\nOutput',
-    color: COLORS.success,
+    color: '#81c784', // green
     size: 120,
     position: { top: 200, right: 40 }
   },
   {
     key: 'completion',
     label: 'Fill in\nBlanks',
-    color: COLORS.accent,
+    color: '#64b5f6', // blue
     size: 90,
     position: { top: 350, left: 60 }
   },
   {
     key: 'arrange',
     label: 'Arrange\nLines',
-    color: COLORS.secondary,
+    color: '#ba68c8', // purple
     size: 110,
     position: { top: 500, right: 80 }
+  },
+  {
+    key: 'general-knowledge',
+    label: 'General\nKnowledge',
+    color: '#ffd54f', // yellow
+    size: 110,
+    position: { top: 650, left: 80 }
   }
 ];
 

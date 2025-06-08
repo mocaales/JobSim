@@ -8,7 +8,12 @@ import { developerTasks } from '../../../../../data/developerTasks';
 export default function TaskListByType() {
   const { type } = useLocalSearchParams();
   const router = useRouter();
-  const tasks = developerTasks.filter(t => t.type === type);
+  // Popravek: prikaži vse fill-in-the-blank in completion igre pod 'Fill in Blanks'
+  const tasks = type === 'completion'
+    ? developerTasks.filter(t => t.type === 'completion' || t.type === 'fill-in-the-blank')
+    : type === 'general-knowledge'
+      ? developerTasks.filter(t => t.category === 'general-knowledge')
+      : developerTasks.filter(t => t.type === type);
 
   return (
     <View style={styles.container}>
@@ -21,7 +26,7 @@ export default function TaskListByType() {
             style={styles.taskItem}
             onPress={() => router.push(`/job/Developer/tasks/${item.id}`)}
           >
-            <Text style={styles.taskTitle}>{item.title}</Text>
+            <Text style={styles.taskTitle}>{item.title.replace(/^Predict Output: /i, '').replace(/^Fill in the blank: /i, '').replace(/\b\w/g, l => l.toUpperCase())}</Text>
             <Text style={styles.taskDifficulty}>Difficulty: {item.difficulty}</Text>
           </TouchableOpacity>
         )}

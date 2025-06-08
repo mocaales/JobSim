@@ -2,33 +2,12 @@
 import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Alert, Dimensions } from 'react-native';
 import DraggableFlatList from 'react-native-draggable-flatlist';
-import { WebView } from 'react-native-webview';
 import { useLocalSearchParams } from 'expo-router';
 import { COLORS } from '../../../../constants/Colors';
 import { developerTasks } from '../../../../data/developerTasks';
 import { useUser } from '@clerk/clerk-expo'; 
-
-const htmlTemplate = (code) => `
-  <!doctype html>
-  <html>
-    <head>
-      <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0" />
-      <link
-        rel="stylesheet"
-        href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/atom-one-dark.min.css"
-      />
-      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
-      <script>hljs.highlightAll();</script>
-      <style>
-        body { margin: 0; padding: 12px; background: #282C34; }
-        pre { margin: 0; }
-      </style>
-    </head>
-    <body>
-      <pre><code class="language-javascript">${code}</code></pre>
-    </body>
-  </html>
-`;
+import CodeBlock from '../../../../components/CodeBlock';
+import { FontAwesome } from '@expo/vector-icons';
 
 export default function TaskDetail() {
   const { user } = useUser();
@@ -59,49 +38,101 @@ export default function TaskDetail() {
 
 
   const handleAnswer = async (index) => {
-  const isCorrect = index === task.correctIndex;
-
-  if (isCorrect) {
-    await submitDeveloperGameResult();
-    Alert.alert('✅ Correct!', 'Well done.');
-  } else {
-    Alert.alert('❌ Incorrect', 'Try again.');
-  }
-};
+    const isCorrect = index === task.correctIndex;
+    if (isCorrect) {
+      Alert.alert('✅ Correct!', 'Well done.');
+      await submitDeveloperGameResult();
+    } else {
+      Alert.alert('❌ Incorrect', 'Try again.');
+    }
+  };
 
 
 
   // Arrange mode
   const [order, setOrder] = useState(task?.shuffled ?? []);
+  const [hintVisible, setHintVisible] = useState(false);
+  const [checkingOrder, setCheckingOrder] = useState(false);
+  const [hintStates, setHintStates] = useState([]); // shrani pravilnost posamezne vrstice
   if (task?.type === 'arrange') {
+    // Helper: for each line in order, find its nth occurrence in shuffled
+    function getShuffledIndex(line, orderIdx, orderArr, shuffledArr) {
+      let countInOrder = 0;
+      for (let i = 0; i <= orderIdx; i++) {
+        if (orderArr[i] === line) countInOrder++;
+      }
+      // Now find the nth occurrence in shuffled
+      let countInShuffled = 0;
+      for (let j = 0; j < shuffledArr.length; j++) {
+        if (shuffledArr[j] === line) {
+          countInShuffled++;
+          if (countInShuffled === countInOrder) {
+            return j;
+          }
+        }
+      }
+      return -1; // Should not happen
+    }
+
     const checkOrder = async () => {
-    const correct = order.every((line, i) => line === task.lines[i]);
-    if (correct) await submitDeveloperGameResult();
-    Alert.alert(correct ? '✅ Correct!' : '❌ Incorrect');
-  };
+      if (checkingOrder) return;
+      setCheckingOrder(true);
+      const allCorrect = order.every((line, i) => line === task.lines[i]);
+      Alert.alert(allCorrect ? '✅ Correct!' : '❌ Incorrect');
+      submitDeveloperGameResult();
+      setCheckingOrder(false);
+    };
+
+    const showHint = () => {
+      // Per-line correctness: green if correct, red if not
+      const states = order.map((line, i) => line === task.lines[i]);
+      setHintStates(states);
+      setHintVisible(true);
+      setTimeout(() => {
+        setHintVisible(false);
+        setHintStates([]);
+      }, 2000);
+    };
     return (
       <View style={styles.arrangeContainer}>
-        <Text style={styles.title}>{task.title}</Text>
-        <DraggableFlatList
-          data={order}
-          keyExtractor={(item) => item}
-          onDragEnd={({ data }) => setOrder(data)}
-          activationDistance={10}
-          renderItem={({ item, drag, isActive }) => (
-            <TouchableOpacity
-              style={[
-                styles.arrangeItem,
-                isActive && { backgroundColor: '#ddd' }
-              ]}
-              onLongPress={drag}
-            >
-              <Text style={styles.arrangeText}>{item}</Text>
-            </TouchableOpacity>
-          )}
-        />
-        <TouchableOpacity style={styles.checkButton} onPress={checkOrder}>
-          <Text style={styles.checkText}>Preveri vrstni red</Text>
-        </TouchableOpacity>
+        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+          <Text style={styles.title}>{task.title}</Text>
+          <TouchableOpacity onPress={showHint} style={styles.hintIcon} accessibilityLabel="Namig">
+            <FontAwesome name="lightbulb-o" size={26} color={hintVisible ? '#ffe066' : '#bbb'} />
+          </TouchableOpacity>
+        </View>
+        <CodeBlock code={order.join('\n')} style={{marginBottom: 8}} scrollable={false} />
+        <View style={styles.arrangeScrollArea}>
+          <DraggableFlatList
+            data={order}
+            keyExtractor={(item) => item}
+            onDragEnd={({ data }) => setOrder(data)}
+            activationDistance={10}
+            renderItem={({ item, index, drag, isActive }) => {
+              let itemStyle = styles.arrangeItem;
+              if (hintVisible && Array.isArray(hintStates) && hintStates.length === order.length) {
+                if (hintStates[index]) {
+                  itemStyle = [styles.arrangeItem, styles.correctItem];
+                } else {
+                  itemStyle = [styles.arrangeItem, styles.wrongItem];
+                }
+              } else if (isActive) {
+                itemStyle = [styles.arrangeItem, { backgroundColor: '#ddd' }];
+              }
+              return (
+                <TouchableOpacity
+                  style={itemStyle}
+                  onLongPress={drag}
+                >
+                  <Text style={styles.arrangeText}>{item}</Text>
+                </TouchableOpacity>
+              );
+            }}
+          />
+          <TouchableOpacity style={[styles.checkButton, checkingOrder && { opacity: 0.5 }]} onPress={checkOrder} disabled={checkingOrder}>
+            <Text style={styles.checkText}>Preveri vrstni red</Text>
+          </TouchableOpacity>
+        </View>
       </View>
     );
   }
@@ -123,36 +154,19 @@ export default function TaskDetail() {
       {task.difficulty != null && (
         <Text style={styles.difficulty}>Difficulty: {task.difficulty}</Text>
       )}
-      {task.type === 'output' ? (
-        <View style={[styles.codeBox, { width: width - 40, height: codeBoxHeight }]}> 
-          <WebView
-            originWhitelist={['*']}
-            source={{ html: htmlTemplate(task.question) }}
-            scrollEnabled={false}
-            showsVerticalScrollIndicator={false}
-            style={{ backgroundColor: 'transparent' }}
-          />
-        </View>
-      ) : (
-        <View style={[styles.codeBox, { width: width - 40, height: codeBoxHeight }]}> 
-          <WebView
-            originWhitelist={['*']}
-            source={{ html: htmlTemplate(task.question) }}
-            scrollEnabled={false}
-            showsVerticalScrollIndicator={false}
-            style={{ backgroundColor: 'transparent' }}
-          />
-        </View>
-      )}
-      {task.options?.map((opt, index) => (
-        <TouchableOpacity
-          key={index}
-          style={styles.optionButton}
-          onPress={() => handleAnswer(index)}
-        >
-          <Text style={styles.optionText}>{opt}</Text>
-        </TouchableOpacity>
-      ))}
+      {/* Group code and options together so options are always directly under code */}
+      <View style={{ width: width - 40, alignSelf: 'center' }}>
+        <CodeBlock code={task.question} style={{ minHeight: codeBoxHeight }} />
+        {task.options?.map((opt, index) => (
+          <TouchableOpacity
+            key={index}
+            style={styles.optionButton}
+            onPress={() => handleAnswer(index)}
+          >
+            <Text style={styles.optionText}>{opt}</Text>
+          </TouchableOpacity>
+        ))}
+      </View>
     </View>
   );
 }
@@ -162,6 +176,12 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 20,
     backgroundColor: COLORS.white
+  },
+  arrangeScrollArea: {
+    flex: 1,
+    minHeight: 200,
+    maxHeight: 420,
+    // Optionally add padding or margin if needed
   },
   defaultContainer: {
     flex: 1,
@@ -199,6 +219,16 @@ const styles = StyleSheet.create({
     marginVertical: 6,
     backgroundColor: '#f0f0f0',
     borderRadius: 6
+  },
+  correctItem: {
+    backgroundColor: '#b6f5c6',
+  },
+  wrongItem: {
+    backgroundColor: '#ffd6d6',
+  },
+  hintIcon: {
+    marginLeft: 10,
+    padding: 4,
   },
   arrangeText: {
     fontFamily: 'monospace'
