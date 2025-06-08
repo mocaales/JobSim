@@ -1,4 +1,3 @@
-// app/job/SpecUrgMed/game/scenarios.js
 export default {
   start: {
     id: 'start',
@@ -16,7 +15,7 @@ export default {
     title: 'Collect History',
     text:
       'Pain migrated to RLQ and patient reports anorexia. Next?',
-    image: require('../../../../assets/chart.png'),
+    image: require('../../../../assets/history.jpg'),
     options: [
       { label: 'Order labs (CBC, CRP)', next: 'labs',       set: { sawLabs: true } },
       { label: 'Do ultrasound',         next: 'ultrasound', conditions: ['didHistory'] },
@@ -27,7 +26,7 @@ export default {
     id: 'exam',
     title: 'Physical Exam',
     text: 'Rebound tenderness on palpation. Next?',
-    image: require('../../../../assets/exam.png'),
+    image: require('../../../../assets/physical-exam.jpg'),
     options: [
       { label: 'Order CT scan', next: 'ct',       set: { sawCT: true }    },
       { label: 'Start IV fluids', next: 'ivFluids', set: { gaveFluids: true } },
@@ -38,6 +37,7 @@ export default {
     id: 'labs',
     title: 'Lab Results',
     text: 'WBC and CRP elevated. What now?',
+    image: require('../../../../assets/chart.png'),
     options: [
       { label: 'Refer for surgery', next: 'surgery' },
       { label: 'Watchful waiting',   next: 'observe' },
@@ -49,6 +49,7 @@ export default {
     title: 'Ultrasound',
     text:
       'Ultrasound suggests appendicitis. Next?',
+    image: require('../../../../assets/ultra.jpg'),
     options: [
       { label: 'Prep for appendectomy', next: 'surgery' },
       { label: 'Give antibiotics',       next: 'observe' },
@@ -59,6 +60,7 @@ export default {
     id: 'ct',
     title: 'CT Scan',
     text: 'CT confirms appendicitis. Scenario complete!',
+    image: require('../../../../assets/ct.jpg'),
     options: [],
     conditions: ['sawCT'],
   },
@@ -67,6 +69,7 @@ export default {
     title: 'IV Fluids',
     text:
       'IV fluids administered; patient is more stable. Next?',
+    image: require('../../../../assets/iv-fluids.jpg'),
     options: [
       { label: 'Order CT scan', next: 'ct' },
       { label: 'Order labs',    next: 'labs' },
@@ -77,12 +80,14 @@ export default {
     id: 'surgery',
     title: 'Surgery',
     text: 'Appendectomy successful – scenario complete!',
+    image: require('../../../../assets/surgery.jpg'),
     options: [],
   },
   observe: {
     id: 'observe',
     title: 'Observation',
     text: 'Condition worsened overnight – Patient died!',
+    image: require('../../../../assets/lost.jpg'),
     options: [],
   },
 
@@ -90,7 +95,7 @@ export default {
   id: 'chestpain_start',
   title: 'Emergency Room',
   text: 'A 58-year-old man presents to the ER with 30 minutes of crushing chest pain radiating to his left arm. He is sweaty and weak. What do you do first?',
-  // image: require('../../../../assets/chest-pain.png'),
+  image: require('../../../../assets/chest-pain.jpg'),
   options: [
     { label: 'ABCDE + vital signs', next: 'chestpain_abcde', set: { didAbcde: true } },
     { label: 'Give water and wait', next: 'chestpain_delay' },
@@ -100,14 +105,14 @@ chestpain_delay: {
   id: 'chestpain_delay',
   title: 'Deterioration!',
   text: 'The patient loses consciousness. Because of the delay, he suffers a cardiac arrest. End of scenario.',
-  // image: require('../../../../assets/cpr.png'),
+  image: require('../../../../assets/cpr.jpg'),
   options: [],
 },
 chestpain_abcde: {
   id: 'chestpain_abcde',
   title: 'ABCDE Assessment',
   text: 'The patient is stable, SpO2 95%, BP 140/80. What do you do next?',
-  // image: require('../../../../assets/vitals.png'),
+  image: require('../../../../assets/vitals.jpg'),
   options: [
     { label: 'Do an ECG', next: 'chestpain_ekg', set: { didEkg: true } },
     { label: 'Wait for lab results', next: 'chestpain_arrest' },
@@ -118,14 +123,14 @@ chestpain_arrest: {
   id: 'chestpain_arrest',
   title: 'Too Late',
   text: 'While waiting for lab results, the patient develops cardiac arrest. End of scenario.',
-  // image: require('../../../../assets/cpr.png'),
+  image: require('../../../../assets/cpr.jpg'),
   options: [],
 },
 chestpain_ekg: {
   id: 'chestpain_ekg',
   title: 'ECG: STEMI',
   text: 'ECG confirms STEMI. What is your next step?',
-  // image: require('../../../../assets/ekg-stemi.png'),
+  image: require('../../../../assets/stemi.jpg'),
   options: [
     { label: 'Give aspirin', next: 'chestpain_aspirin', set: { gaveAspirin: true } },
     { label: 'Give benzodiazepine', next: 'chestpain_wrongmed' },
@@ -136,14 +141,14 @@ chestpain_wrongmed: {
   id: 'chestpain_wrongmed',
   title: 'Wrong Medication',
   text: 'Benzodiazepines do not help in STEMI! The patient deteriorates. End of scenario.',
-  // image: require('../../../../assets/benzodiazepine.png'),
+  image: require('../../../../assets/benzo.jpg'),
   options: [],
 },
 chestpain_aspirin: {
   id: 'chestpain_aspirin',
   title: 'Treatment',
   text: 'Aspirin has been given. What else do you do?',
-  // image: require('../../../../assets/aspirin.png'),
+  image: require('../../../../assets/aspirin.jpg'),
   options: [
     { label: 'Give sublingual nitroglycerin', next: 'chestpain_nitro', set: { gaveNitro: true } },
     { label: 'Give paracetamol', next: 'chestpain_wrongmed2' },
@@ -154,14 +159,14 @@ chestpain_wrongmed2: {
   id: 'chestpain_wrongmed2',
   title: 'No Effect',
   text: 'Paracetamol does not help – the patient’s condition worsens. End of scenario.',
-  // image: require('../../../../assets/painkillers.png'),
+  image: require('../../../../assets/paracetamol.jpg'),
   options: [],
 },
 chestpain_nitro: {
   id: 'chestpain_nitro',
   title: 'Additional Therapy',
   text: 'Sublingual nitroglycerin (if not contraindicated). What else must you give?',
-  // image: require('../../../../assets/nitro.png'),
+  image: require('../../../../assets/nitro.jpg'),
   options: [
     { label: 'Antiplatelet agent (clopidogrel)', next: 'chestpain_clopidogrel', set: { gaveClopidogrel: true } },
     { label: 'Antibiotic', next: 'chestpain_wrongmed3' },
@@ -172,14 +177,14 @@ chestpain_wrongmed3: {
   id: 'chestpain_wrongmed3',
   title: 'Wrong Therapy',
   text: 'Antibiotics are not needed. Delay in therapy – the patient develops arrhythmia and cardiac arrest.',
-  // image: require('../../../../assets/cpr.png'),
+  image: require('../../../../assets/arrest.png'),
   options: [],
 },
 chestpain_clopidogrel: {
   id: 'chestpain_clopidogrel',
   title: 'Correct Therapy',
   text: 'The patient has received all necessary medications. What now?',
-  // image: require('../../../../assets/antiplatelet.png'),
+  image: require('../../../../assets/what.jpg'),
   options: [
     { label: 'Call PCI center / urgent transfer', next: 'chestpain_success' },
     { label: 'Admit for overnight observation', next: 'chestpain_death' },
@@ -190,23 +195,21 @@ chestpain_success: {
   id: 'chestpain_success',
   title: 'Success!',
   text: 'The patient is urgently transferred for invasive treatment and survives without permanent damage! ✅',
-  // image: require('../../../../assets/success.png'),
+  image: require('../../../../assets/success.jpg'),
   options: [],
 },
 chestpain_death: {
   id: 'chestpain_death',
   title: 'Tragedy',
   text: 'During observation overnight, the patient suffers a massive MI and dies. End of scenario.',
-  // image: require('../../../../assets/cpr.png'),
+  image: require('../../../../assets/arrest.png'),
   options: [],
 },
-
-
 polytrauma_start: {
   id: 'polytrauma_start',
   title: 'Emergency Room – Trauma Call',
   text: 'A 32-year-old man is brought in after a high-speed car accident. He is pale, confused, and bleeding from a leg wound. What do you do first?',
-  // image: require('../../../../assets/trauma-room.png'),
+  image: require('../../../../assets/trauma-room.png'),
   options: [
     { label: 'Start with ABCDE approach', next: 'polytrauma_abcde', set: { didAbcde: true } },
     { label: 'Order whole-body CT immediately', next: 'polytrauma_delay' },
@@ -216,14 +219,14 @@ polytrauma_delay: {
   id: 'polytrauma_delay',
   title: 'Critical Delay',
   text: 'You lost time by not stabilizing the patient. He goes into cardiac arrest before reaching CT. End of scenario.',
-  // image: require('../../../../assets/cpr.png'),
+  image: require('../../../../assets/lost.jpg'),
   options: [],
 },
 polytrauma_abcde: {
   id: 'polytrauma_abcde',
   title: 'Primary Survey',
   text: 'Airway is patent, breathing rapid, pulse 140, BP 85/50, cold extremities. Obvious open femur fracture. What next?',
-  // image: require('../../../../assets/vitals.png'),
+  image: require('../../../../assets/vitalss.jpg'),
   options: [
     { label: 'Control bleeding & apply pelvic binder', next: 'polytrauma_bleed', set: { didBleedControl: true } },
     { label: 'Start with head-to-toe exam', next: 'polytrauma_excessiveexam' },
@@ -234,14 +237,14 @@ polytrauma_excessiveexam: {
   id: 'polytrauma_excessiveexam',
   title: 'Wasted Time',
   text: 'You spend too long examining minor injuries. The patient deteriorates from ongoing bleeding. End of scenario.',
-  // image: require('../../../../assets/cpr.png'),
+  image: require('../../../../assets/ddd.jpg'),
   options: [],
 },
 polytrauma_bleed: {
   id: 'polytrauma_bleed',
   title: 'Bleeding Control',
   text: 'Bleeding controlled, pelvic binder in place. BP improves to 95/60. What next?',
-  // image: require('../../../../assets/bleeding.png'),
+  image: require('../../../../assets/blee.jpg'),
   options: [
     { label: 'Give IV fluids and urgent blood transfusion', next: 'polytrauma_fluids', set: { gaveFluids: true } },
     { label: 'Wait for blood results before fluids', next: 'polytrauma_shock' },
@@ -252,14 +255,14 @@ polytrauma_shock: {
   id: 'polytrauma_shock',
   title: 'Shock',
   text: 'Without urgent resuscitation, the patient develops hypovolemic shock and cardiac arrest. End of scenario.',
-  // image: require('../../../../assets/shock.png'),
+  image: require('../../../../assets/lost.jpg'),
   options: [],
 },
 polytrauma_fluids: {
   id: 'polytrauma_fluids',
   title: 'Initial Resuscitation',
   text: 'Fluids and blood products are given. BP stabilizes at 110/70. The patient is still confused. What now?',
-  // image: require('../../../../assets/ivfluids.png'),
+  image: require('../../../../assets/iv-fluids.jpg'),
   options: [
     { label: 'Immediate whole-body trauma CT', next: 'polytrauma_ct', set: { didCT: true } },
     { label: 'Send to X-ray and ultrasound separately', next: 'polytrauma_delayct' },
@@ -270,14 +273,14 @@ polytrauma_delayct: {
   id: 'polytrauma_delayct',
   title: 'Wasted Time',
   text: 'Multiple single investigations take too long. The patient develops another episode of shock. End of scenario.',
-  // image: require('../../../../assets/ctdelay.png'),
+  image: require('../../../../assets/ctdelay.jpg'),
   options: [],
 },
 polytrauma_ct: {
   id: 'polytrauma_ct',
   title: 'Trauma CT',
   text: 'CT shows liver laceration and active bleeding, femur fracture, and possible pelvic fracture. What next?',
-  // image: require('../../../../assets/ct-trauma.png'),
+  image: require('../../../../assets/ct-trauma.jpg'),
   options: [
     { label: 'Activate massive transfusion protocol & call surgeons', next: 'polytrauma_surgery', set: { calledSurgery: true } },
     { label: 'Send to regular ward for monitoring', next: 'polytrauma_badoutcome' },
@@ -288,14 +291,14 @@ polytrauma_badoutcome: {
   id: 'polytrauma_badoutcome',
   title: 'Wrong Decision',
   text: 'The patient rapidly deteriorates on the ward and dies of internal bleeding. End of scenario.',
-  // image: require('../../../../assets/badoutcome.png'),
+  image: require('../../../../assets/badoutcome.jpg'),
   options: [],
 },
 polytrauma_surgery: {
   id: 'polytrauma_surgery',
   title: 'Emergency Surgery',
   text: 'Patient is taken immediately to the OR. Damage control surgery is performed. What is the outcome?',
-  // image: require('../../../../assets/surgery.png'),
+  image: require('../../../../assets/surgery.jpg'),
   options: [
     { label: 'ICU admission and continued monitoring', next: 'polytrauma_success' },
     { label: 'Send to regular ward', next: 'polytrauma_warddeath' },
@@ -306,14 +309,14 @@ polytrauma_warddeath: {
   id: 'polytrauma_warddeath',
   title: 'Deterioration',
   text: 'Patient deteriorates on the ward and dies due to multi-organ failure. End of scenario.',
-  // image: require('../../../../assets/cpr.png'),
+  image: require('../../../../assets/lost.jpg'),
   options: [],
 },
 polytrauma_success: {
   id: 'polytrauma_success',
   title: 'Success!',
   text: 'Patient survives with prompt surgery and ICU care. He makes a good recovery! ✅',
-  // image: require('../../../../assets/success.png'),
+  image: require('../../../../assets/vitals.jpg'),
   options: [],
 },
 

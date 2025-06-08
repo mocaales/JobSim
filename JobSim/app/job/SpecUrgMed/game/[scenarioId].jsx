@@ -130,9 +130,11 @@ const styles = StyleSheet.create({
   },
   image: {
     width: '100%',
-    height: 200,
+    height: 280, // 40% več kot prej (200 * 1.4 = 280)
     marginBottom: 12,
     borderRadius: 8,
+    resizeMode: 'contain',
+    backgroundColor: 'transparent', // odstrani sivino/okvir
   },
   text: {
     fontSize: 18,
