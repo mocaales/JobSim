@@ -77,7 +77,7 @@ const usesPoints = (game) => [
       <Text style={[styles.cell, styles.emailCell]}>{item.nickname || item.email}</Text>
       <Text style={[styles.cell, styles.timeCell]}>
         {usesPoints(selectedGame)
-          ? (item.points ?? '-')
+          ? (item.score != null ? item.score.toFixed(1) : '-')
           : (item.time !== undefined ? `${item.time}s` : '-')}
       </Text>
     </View>

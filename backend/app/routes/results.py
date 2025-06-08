@@ -2,6 +2,7 @@ from fastapi import APIRouter
 from pydantic import BaseModel
 from app.database import db
 from app.utils.email_utils import send_email
+from typing import Optional
 
 router = APIRouter()
 
@@ -11,6 +12,7 @@ class GameResult(BaseModel):
     game: str
     difficulty: str = None
     recipe: str = None
+    score: Optional[float] = None
 
 @router.post("/game/submit")
 async def submit_game_result(result: GameResult):
@@ -26,7 +28,8 @@ async def submit_game_result(result: GameResult):
         if result.time < existing["time"]:
             await db.games_results.update_one(
                 {"_id": existing["_id"]},
-                {"$set": {"time": result.time}}
+                {"$set": {"time": result.time,
+                          "score": result.score}}
             )
             subject = f"🎉 Novi osebni rekord za {result.game}!"
             body = f"""
@@ -50,6 +53,8 @@ async def submit_game_result(result: GameResult):
         "email": result.email,
         "time": result.time,
         "game": result.game,
+        "score": result.score,
+
         # take nickname from users collection, fallback to email
         #"nickname": (await db.users.find_one(
         #    {"email": result.email},
@@ -60,6 +65,9 @@ async def submit_game_result(result: GameResult):
         insert_data["recipe"] = result.recipe
     else:
         insert_data["difficulty"] = result.difficulty
+
+    if result.game == "dispatcher" and result.score is not None:
+        insert_data["score"] = result.score
 
     await db.games_results.insert_one(insert_data)
 
@@ -105,6 +113,7 @@ async def get_game_leaderboard(game: str, difficulty: str = None, recipe: str = 
             "email": r["email"],
             "nickname": email_to_nickname.get(r["email"]),
             "time": r["time"],
+            "score": r.get("score"),
             "difficulty": r.get("difficulty"),
             "recipe": r.get("recipe")
         })

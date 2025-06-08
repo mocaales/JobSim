@@ -5,10 +5,13 @@ import * as turf from '@turf/turf';
 import { useRouter } from 'expo-router';
 import { COLORS } from '../../../constants/Colors';
 import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
+import { useUser } from "@clerk/clerk-expo";
 
 const HOSPITAL = [15.64869, 46.55175]; // lon,lat for Maribor hospital
 
 export default function DispatcherGame() {
+
+  const { user, isLoaded } = useUser();
 
   const [showIntro, setShowIntro] = useState(true);
   
@@ -72,17 +75,64 @@ export default function DispatcherGame() {
   }, [call]);
 
   // Submit user route for scoring
-  const submitRoute = () => {
-    if (!userRoute.length) return Alert.alert('Draw route first');
-    const optLine = turf.lineString(optimalRoute.map(p => [p.longitude, p.latitude]));
+    const submitRoute = async () => {
+    if (!userRoute.length) {
+      return Alert.alert('Draw route first');
+    }
+    if (!isLoaded || !user || !user.primaryEmailAddress) {
+      return Alert.alert('Error', 'You must be signed in to submit your score.');
+    }
+
+    const email = user.primaryEmailAddress.emailAddress;
+    // calculate your time
+    const time = secondsElapsed;
+
+    const optLine  = turf.lineString(optimalRoute.map(p => [p.longitude, p.latitude]));
     const userLine = turf.lineString(userRoute.map(p => [p.longitude, p.latitude]));
-    const optDist = turf.length(optLine, { units: 'kilometers' });
+    const optDist  = turf.length(optLine,  { units: 'kilometers' });
     const userDist = turf.length(userLine, { units: 'kilometers' });
-    const pct = ((optDist / userDist) * 100).toFixed(1);
+    const efficiency = (optDist / userDist * 100).toFixed(1);
+    const score      = (efficiency - (time / 2)).toFixed(1);
+
+    // 2) show it before posting
     Alert.alert(
       'Route Complete',
-      `Your: ${userDist.toFixed(2)} km\nOptimal: ${optDist.toFixed(2)} km\nEfficiency: ${pct}%`
+      `Your: ${userDist.toFixed(2)} km\n` +
+      `Optimal: ${optDist.toFixed(2)} km\n\n` +
+      `Efficiency: ${efficiency}%\n` +
+      `Score: ${score}`
     );
+
+    // (optional) include score in your payload if you want to store it:
+
+    try {
+      const resp = await fetch(
+        `${process.env.EXPO_PUBLIC_API_URL}/game/submit`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            email,
+            time,
+            game: 'dispatcher',
+            score
+          }),
+        }
+      );
+      const body = await resp.json();
+
+      if (!resp.ok) {
+        console.error('Failed to submit dispatcher score:', body);
+        return Alert.alert('Error', 'Could not save your dispatcher score.');
+      }
+
+      Alert.alert('Submitted!', body.message);
+      // navigate back so they can view the leaderboard
+      router.push('/home');
+    } catch (err) {
+      console.error('Network error submitting dispatcher:', err);
+      Alert.alert('Network error', 'Please try again in a moment.');
+    }
   };
 
   if (showIntro) {
@@ -106,6 +156,12 @@ export default function DispatcherGame() {
           <View style={styles.tipItem}>
             <Text style={styles.introText}>
               Clear All removes all drawn lines
+            </Text>
+          </View>
+          <View style={styles.tipItem}>
+            <Text style={styles.introText}>
+              Score is calculated with the following formula:
+              efficiency - (time/2)
             </Text>
           </View>
           <TouchableOpacity
