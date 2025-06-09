@@ -1,17 +1,14 @@
 FROM python:3.11-slim
 
-WORKDIR /
+WORKDIR /app
 
-COPY backend/requirements.txt .
+COPY backend/requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
 
 COPY backend/ ./backend/
-COPY copy-run ./copy-run
 
-RUN chmod +x copy-run
-
-ENV PYTHONPATH="${PYTHONPATH}:/backend"
+ENV PYTHONPATH="${PYTHONPATH}:/app/backend"
 
 EXPOSE 8000
 
-CMD ["./copy-run"]
+CMD ["uvicorn", "backend.app.main:app", "--host", "0.0.0.0", "--port", "8000"]
