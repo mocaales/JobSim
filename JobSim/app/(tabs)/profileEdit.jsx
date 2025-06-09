@@ -17,6 +17,7 @@ import {
 import { useRouter } from "expo-router";
 import { useUser } from "@clerk/clerk-expo";
 import { COLORS } from "../../constants/Colors";
+import AntDesign from '@expo/vector-icons/AntDesign';
 
 // 1) List of all avatar image files under assets/profileImg.
 //    The `key` is the string we will store in Mongo (in `imageUrl`).
@@ -33,6 +34,14 @@ const AVATAR_IMAGES = [
   { key: "avatar8", source: require("../../assets/profileImg/avatar8.jpg") },
 ];
 
+const AVATAR_UNLOCK = {
+  avatar4: 1,
+  avatar5: 2,
+  avatar6: 3,
+  avatar7: 4,
+  avatar8: 5,
+}
+
 export default function ProfileEdit() {
   const router = useRouter();
   const { user, isLoaded } = useUser();
@@ -42,6 +51,7 @@ export default function ProfileEdit() {
   const [selectedAvatar, setSelectedAvatar] = useState(""); 
   const [updating, setUpdating] = useState(false);
   const [loadingProfile, setLoadingProfile] = useState(true);
+  const [gamesPlayed, setGamesPlayed] = useState(0);
 
   // 2) When Clerk’s user object is ready, fetch our own backend’s profile:
   useEffect(() => {
@@ -80,7 +90,8 @@ export default function ProfileEdit() {
         } else {
           // If for some reason no imageUrl is stored, default to first in AVATAR_IMAGES:
           setSelectedAvatar(AVATAR_IMAGES[0].key);
-        }
+        };
+        setGamesPlayed(data.games_played || 0);
       })
       .catch(() => {
         // Either 404 or some other error → use Clerk’s data as fallback
@@ -161,22 +172,48 @@ export default function ProfileEdit() {
           <Text style={{ marginTop: 8, fontStyle: "italic" }}>
             Tap below to change avatar
           </Text>
+          <Text style={{ marginTop: 4, color: COLORS.gray }}>
+            Games played: {gamesPlayed}
+          </Text>
         </View>
 
         {/* 6) Grid of selectable avatars */}
         <View style={styles.avatarGrid}>
-          {AVATAR_IMAGES.map((av) => (
-            <TouchableOpacity
-              key={av.key}
-              onPress={() => setSelectedAvatar(av.key)}
-              style={[
-                styles.avatarOption,
-                av.key === selectedAvatar && styles.avatarOptionSelected,
-              ]}
-            >
-              <Image source={av.source} style={styles.avatarThumbnail} />
-            </TouchableOpacity>
-          ))}
+          {AVATAR_IMAGES.map((av) => {
+  const required = AVATAR_UNLOCK[av.key] || 0;
+  const locked   = gamesPlayed < required;
+
+  return (
+    <TouchableOpacity
+      key={av.key}
+      onPress={() => {
+        if (locked) {
+          Alert.alert(
+            "Locked",
+            `Play ${required} games to unlock this avatar.`
+          );
+        } else {
+          setSelectedAvatar(av.key);
+        }
+      }}
+      style={[
+        styles.avatarOption,
+        av.key === selectedAvatar && styles.avatarOptionSelected,
+        locked && { opacity: 0.4 },
+      ]}
+    >
+      <Image source={av.source} style={styles.avatarThumbnail} />
+      {locked && (
+        <AntDesign
+          name="lock"
+          size={24}
+          color="black"
+          style={styles.lockIcon}
+        />
+      )}
+    </TouchableOpacity>
+  );
+})}
         </View>
 
         {/* 7) Nickname input */}
@@ -244,6 +281,11 @@ const styles = StyleSheet.create({
     width: 60,
     height: 60,
     borderRadius: 30,
+  },
+    lockIcon: {
+    position: "absolute",
+    top: 4,
+    right: 4,
   },
   label: {
     fontSize: 14,

@@ -71,6 +71,12 @@ async def submit_game_result(result: GameResult):
 
     await db.games_results.insert_one(insert_data)
 
+        # ── bump games_played on the user document ───────────────────────────
+    await db.users.update_one(
+      {"email": result.email},
+      {"$inc": {"games_played": 1}}
+    )
+
     subject = f"🔥 Prvi rezultat za {result.game}!"
     body = f"""
     <html>

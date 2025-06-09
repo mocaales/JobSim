@@ -9,6 +9,7 @@ class UserProfile(BaseModel):
     email: EmailStr
     nickname: str
     imageUrl: Optional[str] = None
+    games_played: int = Field(0, description="Total number of games played")
 
 @router.post("/upsert")
 async def upsert_user(profile: UserProfile):
@@ -17,6 +18,7 @@ async def upsert_user(profile: UserProfile):
         "email": profile.email,
         "nickname": profile.nickname,
         "imageUrl": profile.imageUrl,
+        "games_played": profile.games_played,
     }
     # try updating existing document by email, else insert new
     await db.users.update_one(
@@ -36,5 +38,6 @@ async def get_user(email: EmailStr):
     return UserProfile(
         email=user_doc["email"],
         nickname=user_doc["nickname"],
-        imageUrl=user_doc.get("imageUrl")
+        imageUrl=user_doc.get("imageUrl"),
+        games_played=user_doc.get("games_played", 0)
     )
