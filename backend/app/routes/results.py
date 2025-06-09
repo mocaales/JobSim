@@ -103,7 +103,10 @@ async def get_game_leaderboard(game: str, difficulty: str = None, recipe: str = 
     elif difficulty:
         query["difficulty"] = difficulty
 
-    results = await db.games_results.find(query).sort("time", 1).limit(100).to_list(100)
+    if game in ["developer", "emergency-medicine-specialist", "dispatcher"]:
+        results = await db.games_results.find(query).sort("score", -1).limit(100).to_list(100)
+    else:
+        results = await db.games_results.find(query).sort("time", 1).limit(100).to_list(100)
 
     # Zberi unikatne email naslove
     emails = list({r["email"] for r in results})

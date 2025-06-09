@@ -64,6 +64,7 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     marginBottom: 20,
     color: COLORS.black,
+    textAlign: 'center',
   },
   sectionTitle: {
     fontSize: 18,

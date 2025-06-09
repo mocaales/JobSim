@@ -1,5 +1,3 @@
-// app/(tabs)/SettingsPage.jsx
-
 import React from 'react'
 import {
   SafeAreaView,
@@ -8,9 +6,11 @@ import {
   TouchableOpacity,
   Alert,
   StyleSheet,
+  ActivityIndicator,
 } from 'react-native'
 import { useUser } from '@clerk/clerk-expo'
 import { COLORS } from '../../constants/Colors'
+import { FontAwesome5, MaterialIcons } from '@expo/vector-icons'
 
 export default function SettingsPage() {
   const { user, isLoaded } = useUser()
@@ -43,8 +43,7 @@ export default function SettingsPage() {
         {
           text: 'Delete',
           style: 'destructive',
-          onPress: () =>
-            clearEndpoint('/game/clear-all', 'game scores'),
+          onPress: () => clearEndpoint('/game/clear-all', 'game scores'),
         },
       ]
     )
@@ -58,64 +57,116 @@ export default function SettingsPage() {
         {
           text: 'Delete',
           style: 'destructive',
-          onPress: () =>
-            clearEndpoint('/quiz/clear-all', 'quiz scores'),
+          onPress: () => clearEndpoint('/quiz/clear-all', 'quiz scores'),
         },
       ]
     )
 
+  // Show loading screen until Clerk loads user
+  if (!isLoaded) {
+    return (
+      <SafeAreaView style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color={COLORS.primary || '#000'} />
+        <Text style={styles.loadingText}>Loading settings...</Text>
+      </SafeAreaView>
+    )
+  }
+
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.section}>
-        <Text style={styles.heading}>Settings</Text>
-      </View>
+      <Text style={styles.sectionTitle}>Settings</Text>
 
-      <View style={styles.section}>
-        <TouchableOpacity
-          style={styles.button}
-          onPress={handleClearGames}
-          disabled={!isLoaded || !email}
-        >
-          <Text style={styles.buttonText}>Clear All My Game Scores</Text>
-        </TouchableOpacity>
-      </View>
-
-      <View style={styles.section}>
-        <TouchableOpacity
-          style={styles.button}
-          onPress={handleClearQuizzes}
-          disabled={!isLoaded || !email}
-        >
-          <Text style={styles.buttonText}>Clear All My Quiz Scores</Text>
-        </TouchableOpacity>
-      </View>
+      <SettingCard
+        icon={<FontAwesome5 name="gamepad" size={24} color="#555" />}
+        title="Game scores"
+        description="Delete all your game results"
+        onPress={handleClearGames}
+        disabled={!email}
+      />
+      <SettingCard
+        icon={<MaterialIcons name="quiz" size={24} color="#555" />}
+        title="Quiz scores"
+        description="Delete all your quiz answers"
+        onPress={handleClearQuizzes}
+        disabled={!email}
+      />
     </SafeAreaView>
+  )
+}
+
+function SettingCard({ icon, title, description, onPress, disabled }) {
+  return (
+    <TouchableOpacity
+      style={[styles.card, disabled && styles.cardDisabled]}
+      onPress={onPress}
+      disabled={disabled}
+    >
+      <View style={styles.iconContainer}>{icon}</View>
+      <View style={styles.textContainer}>
+        <Text style={styles.cardTitle}>{title}</Text>
+        <Text style={styles.cardDescription}>{description}</Text>
+      </View>
+    </TouchableOpacity>
   )
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20,
     backgroundColor: COLORS.white,
+    paddingHorizontal: 20,
+    paddingTop: 32,
   },
-  section: {
-    marginVertical: 20,
-  },
-  heading: {
-    fontSize: 20,
+  sectionTitle: {
+    fontSize: 24,
     fontWeight: '600',
+    marginBottom: 12,
     color: COLORS.black,
+    textAlign: 'center',
   },
-  button: {
-    backgroundColor: COLORS.activeIcon,
-    paddingVertical: 12,
-    borderRadius: 8,
+  card: {
+    flexDirection: 'row',
+    backgroundColor: '#f7f7f7',
+    borderRadius: 99,
+    padding: 16,
+    alignItems: 'center',
+    marginBottom: 14,
+    shadowColor: '#000',
+    shadowOpacity: 0.05,
+    shadowOffset: { width: 0, height: 1 },
+    shadowRadius: 3,
+    elevation: 2,
+  },
+  cardDisabled: {
+    opacity: 0.5,
+  },
+  iconContainer: {
+    width: 40,
     alignItems: 'center',
   },
-  buttonText: {
-    color: '#fff',
+  textContainer: {
+    marginLeft: 12,
+    flex: 1,
+  },
+  cardTitle: {
     fontSize: 16,
     fontWeight: '600',
+    color: '#111',
+  },
+  cardDescription: {
+    fontSize: 13,
+    color: '#666',
+    marginTop: 2,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: COLORS.white,
+  },
+  loadingText: {
+    marginTop: 10,
+    fontSize: 16,
+    color: COLORS.black,
   },
 })

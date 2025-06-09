@@ -126,9 +126,13 @@ export default function Home() {
                       style={styles.dropdown}
                       dropDownContainerStyle={styles.dropdownList}
                       textStyle={styles.dropdownText}
-                      maxHeight={250}
+                      maxHeight={160}
                       zIndex={4000}
                       zIndexInverse={1000}
+                      searchable={true}
+                      searchPlaceholder="Search..."
+                      searchTextInputStyle={{ fontSize: 14, color: '#000' }}
+                      listMode="SCROLLVIEW"
                     />
                   </View>
                   <DonutChart email={email} selectedJob={selectedJob} />
@@ -206,6 +210,6 @@ const styles = StyleSheet.create({
   },
   dropdownBox: { height: 40 },
   dropdown: { backgroundColor: '#fff', borderColor: '#ccc', borderRadius: 10 },
-  dropdownList: { backgroundColor: '#fff', borderRadius: 10, maxHeight: 250 },
+  dropdownList: { backgroundColor: '#fff', borderRadius: 10, maxHeight: 170 },
   dropdownText: { fontSize: 16, color: "#111" },
 });
