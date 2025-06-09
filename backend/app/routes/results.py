@@ -119,3 +119,11 @@ async def get_game_leaderboard(game: str, difficulty: str = None, recipe: str = 
         })
 
     return enriched_results
+
+@router.delete("/game/clear-all/{email}")
+async def clear_all_my_scores(email: str):
+    """
+    Delete every game result for the given email.
+    """
+    result = await db.games_results.delete_many({"email": email})
+    return {"deleted_count": result.deleted_count}

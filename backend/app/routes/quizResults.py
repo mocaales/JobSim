@@ -40,3 +40,11 @@ async def get_user_quiz_results(email: str, job: str = None):
     avg_percentage = total_percentage / len(results)
 
     return {"percentage": round(avg_percentage)}
+
+@router.delete("/quiz/clear-all/{email}")
+async def clear_all_quiz_results(email: str):
+    """
+    Delete every quiz result for the given email.
+    """
+    result = await db.quiz_results.delete_many({"email": email})
+    return {"deleted_count": result.deleted_count}
