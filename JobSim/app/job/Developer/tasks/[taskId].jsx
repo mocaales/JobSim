@@ -19,7 +19,7 @@ export default function TaskDetail() {
 
   const submitDeveloperGameResult = async () => {
     const timeTaken = Math.floor((Date.now() - startTime) / 1000);
-    const points = task?.difficulty || 1;
+    const score = task?.difficulty || 1;
     try {
       await fetch(`${process.env.EXPO_PUBLIC_API_URL}/game/submit`, {
         method: 'POST',
@@ -28,7 +28,7 @@ export default function TaskDetail() {
           email,
           game: 'junior_developer',
           time: timeTaken,
-          points
+          score
         })
       });
     } catch (err) {
