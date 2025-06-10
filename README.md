@@ -128,7 +128,7 @@ uvicorn app.main:app --reload --port 8000
 
 ---
 
-## 🧪 Testiranje
+##  Testiranje
 
 - Ročno preko Postman
 - Testirani endpointi: `/predict`, `/submit`, `/leaderboard`, `/check_existing`
@@ -138,22 +138,26 @@ uvicorn app.main:app --reload --port 8000
 
 ## 📸 Posnetki zaslona
 
-📱 Uporabniški vmesnik (simulacije, kvizi, leaderboard, DonutChart)\
-📤 Deployment status (Render dashboard)\
-📊 Analitika (uspešnost po poklicih)
+<p align="center">
+  <img src="JobSim/assets/media/homepage.png" alt="Home Page" width="300"/>
+  <img src="JobSim/assets/media/chat.png" alt="Chats" width="300"/>
+  <img src="JobSim/assets/media/explore.png" alt="Explore page" width="300"/>
+  <img src="JobSim/assets/media/profile.png" alt="Profile page" width="300"/>
+  <img src="JobSim/assets/media/dispatcher_game.gif" alt="Demo GIF" width="265"/>
+</p>
+
 
 ---
 
-## 📦 Nadaljnji razvoj
+## Nadaljnji razvoj
 
-- 🧑‍🔬 Več poklicnih iger
-- 🤖 Generativni AI za priporočila
-- 👥 Mentorji / Career coaches
-- 📊 Napredna statistika
+- Implementacija dodatnih poklicov
+- Nadgradnja in optimizacija AI modelov
+- Vpeljava sistema obračunavanja (billing process)
 
 ---
 
-## 👥 Avtorji
+##  Avtorji
  * Aleš Močnik
  * Jaka Cvikl
  * Jernej Jerot
