@@ -70,7 +70,7 @@ export default function ChatHub() {
 
       {/* 💡 Main Content below the wave */}
       <View style={[styles.safe, { paddingTop: insets.top + 140 }]}>
-        <Text style={styles.heading}>AI Career Tools</Text>
+        <Text style={styles.heading}>Career Tools</Text>
 
         <View style={styles.grid}>
           {features.map((item, index) => (

@@ -1,82 +1,159 @@
-# JobSim
+# JobSim – Interaktivna simulacija karier
 
-Simulacijska mobilna aplikacija za raziskovanje poklicev, kariernih poti in analizo osebnih preferenc. Uporabniki lahko preizkusijo poklice, opravijo kvize, ter se informirajo o veščinah, potrebnih v različnih industrijah.
-
----
-
-## 🏗️ Tehnologije
-
-- **[Expo](https://expo.dev/)** – razvojno okolje za React Native aplikacije
-- **[React Native](https://reactnative.dev/)** – za razvoj mobilne aplikacije
-- **[Expo Router](https://expo.github.io/router/)** – za upravljanje navigacije
-- **[Clerk](https://clerk.com/)** – avtentikacija (Google Login) in upravljanje uporabnikov
-- **[FastAPI](https://fastapi.tiangolo.com/)** – backend API (Python)
-- **[MongoDB](https://www.mongodb.com/)** – podatkovna baza za shranjevanje rezultatov
-- **[XGBoost](https://xgboost.readthedocs.io/)** – strojno učenje za predikcijo poklicev
-- **[React Native Vector Icons](https://github.com/oblador/react-native-vector-icons/)** – ikone v aplikaciji
+JobSim je izobraževalna mobilna aplikacija, ki uporabnikom omogoča raziskovanje različnih poklicev, kariernih poti in osebnih preferenc skozi kvize in simulacije. Cilj je pomagati posameznikom razumeti, kateri poklici jim najbolje ustrezajo na podlagi njihove osebnosti in interesov.
 
 ---
 
-## 🛠️ Namestitev in Zagon
+## 🚀 Funkcionalnosti
 
-### 📱 Frontend (React Native + Expo)
+- ✅ Google prijava (Clerk)
+- 🧠 Predikcija poklica z modelom CatBoost (ML)
+- 🧩 Poklicne simulacije (Cashier, Chef, itd.)
+- 📊 Kvizi z vizualnim prikazom uspešnosti
+- 🏆 Leaderboard s filtri in analitiko
+- 📀 MongoDB za shranjevanje rezultatov
+- 🔁 Posodabljanje obstoječih vnosov
+- 📤 Email obvestila o napredku
+- 🌐 Dockerized backend na Render.com
+- 📱 Expo + React Native frontend
 
-```bash
-# 1. Kloniraj projekt
-git clone https://github.com/username/jobsim.git
-cd jobsim
+---
 
-# 2. Namesti odvisnosti
-npm install
+## ⚙️ Tehnološki sklad
 
-# 3. Ustvari .env datoteko in dodaj Clerk ključe
-touch .env
+### 🎯 Frontend
 
-# 4. Dodaj Clerk ključe v .env
-CLERK_PUBLISHABLE_KEY=your_clerk_publishable_key
-CLERK_FRONTEND_API=your_clerk_frontend_api
-EXPO_PUBLIC_API_URL=https://your-ngrok-url/predict
+- React Native + Expo + Expo Router
+- Clerk (OAuth login)
+- DonutChart, Leaderboard, kvizi, simulacije
+- Ikone z `react-native-vector-icons`
 
-# 5. Dodaj redirect URI v Clerk
-# Odpri LoginScreen in prilepi ta klic:
-import * as AuthSession from 'expo-auth-session';
-console.log(AuthSession.makeRedirectUri());
-# Kopiraj URI v Clerk pod OAuth -> Google -> Redirect URIs
+### 🧠 Backend
 
-# 6. Zaženi aplikacijo z Expo
-npx expo start --tunnel
+- FastAPI (Python)
+- MongoDB + Motor
+- Pydantic 2.x
+- CatBoost (strojno učenje)
+- Uvicorn
+
+### ☁️ Deployment
+
+- Docker + Dockerfile
+- Render Web Service (Docker)
+
+---
+
+## 🧾 Arhitektura
+
+```
+📁 JobSim/
+├── frontend/               # Expo aplikacija (React Native)
+└── backend/
+    ├── app/
+    │   ├── main.py         # FastAPI vstopna točka
+    │   ├── routes/         # API endpoints
+    │   └── models/         # ML modeli (.pkl)
+    ├── Dockerfile
+    └── requirements.txt
 ```
 
 ---
 
-### 📱 Backend (FastAPI + MongoDB)
+## 🐳 Docker Deploy (Render)
+
+**Dockerfile**:
+
+```dockerfile
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+```
+
+**Render Settings**:
+
+- Language: Docker
+- Root Directory: `backend`
+- Build & Start Command: pustimo prazno
+- Environment variables:
+  - `MONGO_URL=...`
+  - `SENDGRID_API_KEY=...`
+
+---
+
+## 📱 Lokalni zagon
+
+### Frontend
 
 ```bash
-# 1. Premakni se v backend mapo
+git clone https://github.com/tvoj-username/jobsim.git
+cd jobsim/frontend
+npm install
+
+# Uredi .env datoteko
+touch .env
+```
+
+`.env`:
+
+```env
+CLERK_PUBLISHABLE_KEY=...
+CLERK_FRONTEND_API=...
+EXPO_PUBLIC_API_URL=https://your-backend.onrender.com
+```
+
+```bash
+npx expo start --tunnel
+```
+
+### Backend
+
+```bash
 cd backend
-
-# 2. Ustvari virtualno okolje in aktiviraj
 python3 -m venv venv
-source venv/bin/activate  # Mac/Linux
-venv\Scripts\activate     # Windows
-
-# 3. Namesti odvisnosti
+source venv/bin/activate
 pip install -r requirements.txt
 
-# 4. Ustvari .env datoteko in dodaj MongoDB URL
+# .env datoteka
 touch .env
-MONGO_URL=<yourmongoconnection>
+```
 
-# 5. Zaženi backend
+`.env`:
+
+```env
+MONGO_URL=...
+SENDGRID_API_KEY=...
+```
+
+```bash
 uvicorn app.main:app --reload --port 8000
 ```
 
 ---
 
-## 📈 Funkcionalnosti
-* Google prijava in avtentikacija (Clerk)
-* Simulacija poklicev in kvizi za raziskovanje kariernih poti
-* Predikcija poklica z uporabo XGBoost modela
-* Shranjevanje in posodabljanje odgovorov uporabnika v MongoDB
-* Prikaz rezultatov glede na pretekle vnose
-* Obvestilo uporabniku, če je vprašalnik že bil rešen (in možnost ponovnega reševanja)
+## 🧪 Testiranje
+
+- Ročno preko Postman
+- Testirani endpointi: `/predict`, `/submit`, `/leaderboard`, `/check_existing`
+- UI testiranje preko Expo Go (simulacije + kvizi)
+
+---
+
+## 📸 Posnetki zaslona
+
+📱 Uporabniški vmesnik (simulacije, kvizi, leaderboard, DonutChart)\
+📤 Deployment status (Render dashboard)\
+📊 Analitika (uspešnost po poklicih)
+
+---
+
+## 📦 Nadaljnji razvoj
+
+- 🧑‍🔬 Več poklicnih iger
+- 🤖 Generativni AI za priporočila
+- 👥 Mentorji / Career coaches
+- 📊 Napredna statistika
+
+---
+
+## 👥 Avtorji
+ * Aleš Močnik
+ * Jaka Cvikl
+ * Jernej Jerot
