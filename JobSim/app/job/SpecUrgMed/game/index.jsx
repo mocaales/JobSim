@@ -36,6 +36,12 @@ export default function GameIndex() {
           <Text style={styles.buttonText}>Begin PolyTrauma Case</Text>
         </TouchableOpacity>
 
+        <TouchableOpacity
+          style={[styles.button, { marginTop: 16, backgroundColor: COLORS.gray }]}
+          onPress={() => router.push('/job/SpecUrgMed')}
+        >
+          <Text style={styles.buttonText}>Back</Text>
+        </TouchableOpacity>
       </ScrollView>
     </SafeAreaView>
   );
