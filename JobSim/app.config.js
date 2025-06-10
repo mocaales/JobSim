@@ -4,10 +4,15 @@ import appJson from './app.json';
 export default {
   expo: {
     ...appJson.expo,
+    updates: {
+      url: "https://u.expo.dev/2f34bcce-844b-47a9-9a92-b3ddef9e4bf2"
+    },
+    runtimeVersion: {
+      policy: "sdkVersion"
+    },
+
     extra: {
-      // privzeto preberi iz .env: EXPO_PUBLIC_API_URL
       apiUrl: process.env.EXPO_PUBLIC_API_URL || 'http://10.0.2.2:5000/api',
-      // ohrani ostale nastavitve
       ...appJson.expo.extra
     }
   }
