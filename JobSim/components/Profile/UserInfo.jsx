@@ -1,6 +1,7 @@
 // JobSim/components/profile/UserInfo.jsx
 
 import React, { useEffect, useState } from "react";
+import { useFocusEffect } from "expo-router";
 import {
   View,
   Text,
@@ -27,7 +28,8 @@ export default function UserInfo() {
   const [loadingProfile, setLoadingProfile] = useState(true);
 
   // ─── 1) First Effect: ensure user record exists (but do not overwrite existing) ─────
-  useEffect(() => {
+  useFocusEffect(
+    React.useCallback(() => {
     if (!isLoaded || !user) return;
     const email = user.primaryEmailAddress?.emailAddress;
     if (!email) return;
@@ -66,10 +68,12 @@ export default function UserInfo() {
       .finally(() => {
         setEnsuring(false);
       });
-  }, [isLoaded, user]);
+  }, [isLoaded, user])
+);
 
   // ─── 2) Second Effect: once user is ensured, fetch their nickname + avatarKey ─────
-  useEffect(() => {
+  useFocusEffect(
+    React.useCallback(() => {
     if (!isLoaded || !user || !didEnsure) return;
     const email = user.primaryEmailAddress?.emailAddress || "";
     setLoadingProfile(true);
@@ -99,7 +103,8 @@ export default function UserInfo() {
       .finally(() => {
         setLoadingProfile(false);
       });
-  }, [isLoaded, user, didEnsure]);
+  }, [isLoaded, user, didEnsure])
+);
 
   // ─── 3) While ensuring or loading, show a spinner ───────────────────────────────
   if (ensuring || loadingProfile) {

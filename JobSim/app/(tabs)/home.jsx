@@ -11,6 +11,7 @@ import {
   ActivityIndicator,                                        // ← added ActivityIndicator
 } from 'react-native';
 import { useUser } from '@clerk/clerk-expo';
+import { useFocusEffect } from 'expo-router';
 import DropDownPicker from 'react-native-dropdown-picker';
 import QuestionnaireCard from '../../components/Home/QuestionnaireCard';
 import Leaderboard from '../../components/Home/Leaderboard';
@@ -39,42 +40,39 @@ export default function Home() {
     { label: 'Emergency Medicine Specialist', value: 'Emergency Medicine Specialist' },
   ]);
 
-  // ── Fetch /user/{email} on mount or whenever email changes ──────────────────────
-  useEffect(() => {
-    if (!isLoaded || !email) return;
-    setLoadingProfile(true);
+  // ── Re-fetch profile whenever the screen is focused ────────────────────────────
+  useFocusEffect(
+    React.useCallback(() => {
+      if (!isLoaded || !email) return;
+      setLoadingProfile(true);
 
-    fetch(`${process.env.EXPO_PUBLIC_API_URL}/user/${encodeURIComponent(email)}`)
-      .then(async (resp) => {
-        if (resp.status === 404) {
-          // No document yet → fallback to Clerk’s fullName + default avatar
-          throw new Error('Not found');
-        }
-        if (!resp.ok) {
-          const text = await resp.text();
-          console.error('Error fetching /user/{email}:', resp.status, text);
-          throw new Error('Fetch failed');
-        }
-        return resp.json();
-      })
-      .then((data) => {
-        // data = { email, nickname, imageUrl }  (imageUrl is the avatar key)
-        setNickname(data.nickname || user.fullName || '');
-        if (data.imageUrl && AVATAR_IMAGES[data.imageUrl]) {
-          setAvatarKey(data.imageUrl);
-        } else {
+      fetch(`${process.env.EXPO_PUBLIC_API_URL}/user/${encodeURIComponent(email)}`)
+        .then(async (resp) => {
+          if (resp.status === 404) throw new Error('Not found');
+          if (!resp.ok) {
+            const text = await resp.text();
+            console.error('Error fetching /user/{email}:', resp.status, text);
+            throw new Error('Fetch failed');
+          }
+          return resp.json();
+        })
+        .then((data) => {
+          setNickname(data.nickname || user.fullName || '');
+          setAvatarKey(
+            data.imageUrl && AVATAR_IMAGES[data.imageUrl]
+              ? data.imageUrl
+              : 'avatar1'
+          );
+        })
+        .catch(() => {
+          setNickname(user.fullName || '');
           setAvatarKey('avatar1');
-        }
-      })
-      .catch(() => {
-        // On 404 or any error, use Clerk’s values + default avatar
-        setNickname(user.fullName || '');
-        setAvatarKey('avatar1');
-      })
-      .finally(() => {
-        setLoadingProfile(false);
-      });
-  }, [isLoaded, email]);
+        })
+        .finally(() => {
+          setLoadingProfile(false);
+        });
+    }, [isLoaded, email])
+  );
 
   // ── While waiting for Clerk or our fetch, show a spinner ────────────────────────
   if (!isLoaded || loadingProfile) {
