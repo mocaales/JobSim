@@ -13,12 +13,11 @@ class UserProfile(BaseModel):
 
 @router.post("/upsert")
 async def upsert_user(profile: UserProfile):
-    print(f"[user/upsert] got payload: {profile.dict()}")
+    print(f"[user/upsert] got payload (no games played): {profile.dict(exclude={'games_played'})}")
     data = {
         "email": profile.email,
         "nickname": profile.nickname,
         "imageUrl": profile.imageUrl,
-        "games_played": profile.games_played,
     }
     # try updating existing document by email, else insert new
     await db.users.update_one(
