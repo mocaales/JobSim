@@ -66,7 +66,9 @@ describe('ChefGame', () => {
 
   it('should show error Alert on wrong order', async () => {
     const ChefGame = require('../../app/job/Chef/game.jsx').default;
-    const { getByText } = render(<ChefGame recipeId={1} />); // brez testSteps!
+    // Podamo napačen vrstni red!
+    const wrongSteps = ['c', 'b', 'a'];
+    const { getByText } = render(<ChefGame recipeId={1} testSteps={wrongSteps} />);
     fireEvent.press(getByText('Start Game'));
     fireEvent.press(getByText('Submit'));
     await waitFor(() => {
