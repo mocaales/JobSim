@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, FlatList, StyleSheet, ScrollView } from 'react-native';
+import { View, Text, FlatList, StyleSheet } from 'react-native';
 import DropDownPicker from 'react-native-dropdown-picker';
 import { COLORS } from '../../constants/Colors';
 import recipes from '../../data/recipes';
@@ -8,21 +8,19 @@ const availableGames = [
   { label: 'Cashier', value: 'cashier' },
   { label: 'Chef', value: 'chef' },
   { label: 'Dispatcher', value: 'dispatcher' },
-  { label: 'Developer', value: 'developer' }, // Use backend value
-  { label: 'Junior Developer', value: 'junior-developer' },
+  { label: 'Developer', value: 'developer' },
   { label: 'Emergency Medicine Specialist', value: 'emergency-medicine-specialist' },
 ];
-
 
 const cashierDifficulties = [
   { label: 'Easy', value: 'easy' },
   { label: 'Medium', value: 'medium' },
-  { label: 'Hard', value: 'hard' }
+  { label: 'Hard', value: 'hard' },
 ];
 
 const chefRecipes = recipes.map(recipe => ({
   label: recipe.title,
-  value: recipe.title
+  value: recipe.title,
 }));
 
 export default function Leaderboard({ game = 'cashier' }) {
@@ -38,9 +36,12 @@ export default function Leaderboard({ game = 'cashier' }) {
 
   const fetchLeaderboard = async () => {
     try {
-      const queryParam = selectedGame === 'cashier'
-        ? `&difficulty=${filterValue}`
-        : `&recipe=${filterValue}`;
+      const queryParam =
+        selectedGame === 'cashier'
+          ? `&difficulty=${filterValue}`
+          : selectedGame === 'chef'
+          ? `&recipe=${filterValue}`
+          : '';
       const response = await fetch(
         `${process.env.EXPO_PUBLIC_API_URL}/game/leaderboard?game=${selectedGame}${filterValue ? queryParam : ''}`
       );
@@ -52,22 +53,21 @@ export default function Leaderboard({ game = 'cashier' }) {
   };
 
   const getFilterOptions = () => {
-  if (selectedGame === 'cashier') return cashierDifficulties;
-  if (selectedGame === 'chef') return chefRecipes;
-  return [];  // ker za druge ni filtrov, torej težavnosti itd...
-};
+    if (selectedGame === 'cashier') return cashierDifficulties;
+    if (selectedGame === 'chef') return chefRecipes;
+    return [];
+  };
 
-const isPointsGame = (game) => [
-  'junior-developer',
-  'developer',
-  'emergency-medicine-specialist'
-].includes(game);
+  const usesPoints = game =>
+    ['developer', 'dispatcher', 'emergency-medicine-specialist'].includes(game);
 
   const renderHeaderRow = () => (
     <View style={[styles.row, styles.headerRow]}>
       <Text style={[styles.cell, styles.rankCell]}>#</Text>
       <Text style={[styles.cell, styles.emailCell]}>Nickname</Text>
-      <Text style={[styles.cell, styles.timeCell]}>{isPointsGame(selectedGame) ? 'Points' : 'Time'}</Text>
+      <Text style={[styles.cell, styles.timeCell]}>
+        {usesPoints(selectedGame) ? 'Points' : 'Time'}
+      </Text>
     </View>
   );
 
@@ -76,9 +76,11 @@ const isPointsGame = (game) => [
       <Text style={[styles.cell, styles.rankCell]}>{index + 1}</Text>
       <Text style={[styles.cell, styles.emailCell]}>{item.nickname || item.email}</Text>
       <Text style={[styles.cell, styles.timeCell]}>
-        {isPointsGame(selectedGame)
-          ? (item.score ?? '-')
-          : (item.time !== undefined ? `${item.time}s` : '-')}
+        {usesPoints(selectedGame)
+          ? item.score?.toFixed(1) ?? '-'
+          : item.time !== undefined
+          ? `${item.time}s`
+          : '-'}
       </Text>
     </View>
   );
@@ -99,27 +101,37 @@ const isPointsGame = (game) => [
           dropDownContainerStyle={styles.dropdownList}
           textStyle={styles.dropdownText}
           searchable={true}
-          searchPlaceholder="Search..."
           listMode="SCROLLVIEW"
-          maxHeight={200}
-          zIndex={5000}
+          searchPlaceholder="Search games..."
+          maxHeight={180}
+          zIndex={3000}
           zIndexInverse={1000}
         />
         {getFilterOptions().length > 0 && (
-        <DropDownPicker
-          open={filterOpen}
-          value={filterValue}
-          items={getFilterOptions()}
-          setOpen={setFilterOpen}
-          setValue={setFilterValue}
-          placeholder={selectedGame === 'cashier' ? 'Select Difficulty' : 'Select Recipe'}
-          containerStyle={styles.dropdownBox}
-          style={styles.dropdown}
-          dropDownContainerStyle={styles.dropdownList}
-          textStyle={styles.dropdownText}
-        />
-      )}
-
+          <DropDownPicker
+            key={selectedGame}
+            open={filterOpen}
+            value={filterValue}
+            items={getFilterOptions()}
+            setOpen={setFilterOpen}
+            setValue={setFilterValue}
+            placeholder={
+              selectedGame === 'cashier' ? 'Select Difficulty' : 'Select Recipe'
+            }
+            containerStyle={styles.dropdownBox}
+            style={styles.dropdown}
+            dropDownContainerStyle={styles.dropdownListScrollable}
+            textStyle={styles.dropdownText}
+            listMode="SCROLLVIEW"
+            scrollViewProps={{ nestedScrollEnabled: true }}
+            searchable={selectedGame === 'chef'}
+            searchPlaceholder="Search..."
+            searchTextInputStyle={styles.searchInput}
+            maxHeight={220}
+            zIndex={2000}
+            zIndexInverse={500}
+          />
+        )}
       </View>
       {renderHeaderRow()}
       <View style={styles.scrollContainer}>
@@ -135,18 +147,90 @@ const isPointsGame = (game) => [
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 20, backgroundColor: '#fff', borderRadius: 12, marginHorizontal: 16, marginTop: 30, shadowColor: '#000', shadowOpacity: 0.1, shadowRadius: 6, elevation: 3 },
-  title: { fontSize: 24, fontWeight: 'bold', textAlign: 'center', marginBottom: 10 },
-  dropdownContainer: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 10 },
-  dropdownBox: { width: '48%' },
-  dropdown: { backgroundColor: '#fff', borderColor: '#ccc', borderRadius: 10, paddingVertical: 10 },
-  dropdownList: { backgroundColor: '#fff', borderRadius: 10 },
-  dropdownText: { fontSize: 16 },
-  row: { flexDirection: 'row', borderBottomWidth: 1, borderBottomColor: '#ccc', paddingVertical: 8, alignItems: 'center', backgroundColor: '#fff', borderRadius: 6, marginBottom: 2 },
-  headerRow: { backgroundColor: COLORS.lightGrey, borderTopWidth: 1, borderTopColor: '#ccc' },
-  cell: { paddingHorizontal: 4 },
-  rankCell: { width: 30, fontWeight: 'bold', textAlign: 'center' },
-  emailCell: { flex: 1, textAlign: 'left' },
-  timeCell: { width: 120, textAlign: 'right' },
-  scrollContainer: {maxHeight: 250}
+  container: {
+    flex: 1,
+    padding: 20,
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    marginHorizontal: 16,
+    marginTop: 30,
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowRadius: 6,
+    elevation: 3,
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    marginBottom: 10,
+  },
+  dropdownContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 10,
+    zIndex: 1000,
+  },
+  dropdownBox: {
+    width: '48%',
+  },
+  dropdown: {
+    backgroundColor: '#fff',
+    borderColor: '#ccc',
+    borderRadius: 10,
+    paddingVertical: 10,
+  },
+  dropdownList: {
+    backgroundColor: '#fff',
+    borderRadius: 10,
+  },
+  dropdownListScrollable: {
+    backgroundColor: '#fff',
+    borderRadius: 10,
+    maxHeight: 180,
+  },
+  dropdownText: {
+    fontSize: 16,
+  },
+  searchInput: {
+    borderColor: '#ccc',
+    borderRadius: 8,
+    height: 40,
+    paddingHorizontal: 10,
+    fontSize: 15,
+  },
+  row: {
+    flexDirection: 'row',
+    borderBottomWidth: 1,
+    borderBottomColor: '#ccc',
+    paddingVertical: 8,
+    alignItems: 'center',
+    backgroundColor: '#fff',
+    borderRadius: 6,
+    marginBottom: 2,
+  },
+  headerRow: {
+    backgroundColor: COLORS.lightGrey,
+    borderTopWidth: 1,
+    borderTopColor: '#ccc',
+  },
+  cell: {
+    paddingHorizontal: 4,
+  },
+  rankCell: {
+    width: 30,
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
+  emailCell: {
+    flex: 1,
+    textAlign: 'left',
+  },
+  timeCell: {
+    width: 120,
+    textAlign: 'right',
+  },
+  scrollContainer: {
+    maxHeight: 250,
+  },
 });
