@@ -22,6 +22,29 @@ async def submit_game_result(result: GameResult):
     else:
         query["difficulty"] = result.difficulty
 
+    # Special: For developer and emergency-medicine-specialist, sum scores
+    if result.game in ["developer", "emergency-medicine-specialist"]:
+        # Always insert a new result (for history), but also update a summary doc
+        await db.games_results.insert_one({
+            "email": result.email,
+            "time": result.time,
+            "game": result.game,
+            "score": result.score,
+            "difficulty": result.difficulty,
+            "recipe": result.recipe
+        })
+        # Upsert a summary doc for fast leaderboard
+        await db.games_results_summary.update_one(
+            {"email": result.email, "game": result.game},
+            {"$inc": {"score": result.score if result.score else 0}},
+            upsert=True
+        )
+        await db.users.update_one(
+            {"email": result.email},
+            {"$inc": {"games_played": 1}}
+        )
+        return {"message": "Score added and summed for user."}
+
     existing = await db.games_results.find_one(query)
 
     if existing:
@@ -103,19 +126,29 @@ async def get_game_leaderboard(game: str, difficulty: str = None, recipe: str = 
     elif difficulty:
         query["difficulty"] = difficulty
 
-    if game in ["developer", "emergency-medicine-specialist", "dispatcher"]:
+    # SPECIAL: For developer and emergency-medicine-specialist, sum all scores per user from summary
+    if game in ["developer", "emergency-medicine-specialist"]:
+        agg_results = await db.games_results_summary.find({"game": game}).sort("score", -1).limit(100).to_list(100)
+        emails = [r["email"] for r in agg_results]
+        users = await db.users.find({"email": {"$in": emails}}, {"email": 1, "nickname": 1}).to_list(None)
+        email_to_nickname = {u["email"]: u.get("nickname") for u in users}
+        enriched_results = []
+        for r in agg_results:
+            enriched_results.append({
+                "email": r["email"],
+                "nickname": email_to_nickname.get(r["email"]),
+                "score": r["score"]
+            })
+        return enriched_results
+
+    if game in ["emergency-medicine-specialist", "dispatcher"]:
         results = await db.games_results.find(query).sort("score", -1).limit(100).to_list(100)
     else:
         results = await db.games_results.find(query).sort("time", 1).limit(100).to_list(100)
 
-    # Zberi unikatne email naslove
     emails = list({r["email"] for r in results})
-
-    # Pridobi vse uporabnike z navedenimi emaili
     users = await db.users.find({"email": {"$in": emails}}, {"email": 1, "nickname": 1}).to_list(None)
     email_to_nickname = {u["email"]: u["nickname"] for u in users}
-
-    # Dodaj nickname (če obstaja) vsakemu rezultatu
     enriched_results = []
     for r in results:
         enriched_results.append({
@@ -126,7 +159,6 @@ async def get_game_leaderboard(game: str, difficulty: str = None, recipe: str = 
             "difficulty": r.get("difficulty"),
             "recipe": r.get("recipe")
         })
-
     return enriched_results
 
 @router.delete("/game/clear-all/{email}")
