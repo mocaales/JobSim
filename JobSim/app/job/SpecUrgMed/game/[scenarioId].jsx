@@ -62,13 +62,12 @@ export default function ScenarioStep() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           email,
-          job: 'Emergency Medicine Specialist',
-          scenario: scenarioName,
-          points,
+          game: 'emergency-medicine-specialist',
+          score: points,
+          time: 0, // Backend zahteva time, a ni pomemben za score igre
         }),
       });
-      const data = await response.json();
-      console.log('✅ Scenario result saved:', data);
+      console.log('✅ Scenario result sent to backend:', { email, game: 'emergency-medicine-specialist', score: points, time: 0 });
     } catch (err) {
       console.warn('⚠️ Failed to save scenario result:', err);
     }

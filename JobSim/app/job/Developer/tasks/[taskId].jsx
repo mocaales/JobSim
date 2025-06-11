@@ -26,7 +26,7 @@ export default function TaskDetail() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           email,
-          game: 'junior_developer',
+          game: 'developer', // Popravljeno iz 'junior_developer' v 'developer'
           time: timeTaken,
           score
         })
