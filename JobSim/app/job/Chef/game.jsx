@@ -9,7 +9,7 @@ import { FontAwesome } from '@expo/vector-icons';
 
 const { width, height } = Dimensions.get('window');
 
-export default function ChefGame() {
+export default function ChefGame({ testSteps }) {
   const { recipeId } = useLocalSearchParams();
   const router = useRouter();
   const { user } = useUser();
@@ -30,7 +30,11 @@ export default function ChefGame() {
   const [timer, setTimer] = useState(90);
   const [gameStarted, setGameStarted] = useState(false);
   const [cheatVisible, setCheatVisible] = useState(false);
-  const [shuffledSteps, setShuffledSteps] = useState([]);
+  const [shuffledSteps, setShuffledSteps] = useState(
+    testSteps
+      ? testSteps.map((step, index) => ({ key: String(index), text: step }))
+      : []
+  );
   const [playTime, setPlayTime] = useState(0);
   const [intervalId, setIntervalId] = useState(null);
   const [showResult, setShowResult] = useState(false);
@@ -47,14 +51,18 @@ export default function ChefGame() {
         return prev - 1;
       });
     }, 1000);
-    return () => clearInterval(interval);
+    return () => clearInterval(interval); // cleanup
   }, [showRecipe]);
 
   const startGame = () => {
     setShowRecipe(false);
     setGameStarted(true);
-    const shuffled = [...recipe.steps].sort(() => Math.random() - 0.5);
-    setShuffledSteps(shuffled.map((step, index) => ({ key: String(index), text: step })));
+    if (testSteps) {
+      setShuffledSteps(testSteps.map((step, index) => ({ key: String(index), text: step })));
+    } else {
+      const shuffled = [...recipe.steps].sort(() => Math.random() - 0.5);
+      setShuffledSteps(shuffled.map((step, index) => ({ key: String(index), text: step })));
+    }
   
     const id = setInterval(() => {
       setPlayTime(prev => prev + 1000);

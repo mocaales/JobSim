@@ -16,6 +16,7 @@ jest.mock('expo-router', () => ({
 jest.mock('../../data/recipes', () => ([{ id: 1, title: 'Test Recipe', steps: ['a', 'b', 'c'], description: 'desc', recipe: 'r' }]));
 
 beforeEach(() => {
+  jest.useFakeTimers();
   global.fetch = jest.fn(() => Promise.resolve({
     json: () => Promise.resolve({ message: 'New result saved 🔥' })
   }));
@@ -23,14 +24,17 @@ beforeEach(() => {
 });
 afterEach(() => {
   jest.clearAllMocks();
+  jest.runOnlyPendingTimers();
+  jest.useRealTimers();
 });
 
 describe('ChefGame', () => {
   it('should call fetch with correct payload on saveResult', async () => {
     const ChefGame = require('../../app/job/Chef/game.jsx').default;
-    // Render game and simuliraj konec igre
-    render(<ChefGame recipeId={1} />);
-    // Počakaj, da se fetch pokliče
+    const correctSteps = ['a', 'b', 'c'];
+    const { getByText } = render(<ChefGame recipeId={1} testSteps={correctSteps} />);
+    fireEvent.press(getByText('Start Game'));
+    fireEvent.press(getByText('Submit'));
     await waitFor(() => {
       expect(global.fetch).toHaveBeenCalledWith(
         expect.stringContaining('/game/submit'),
@@ -45,7 +49,10 @@ describe('ChefGame', () => {
 
   it('should show feedback Alert on new record', async () => {
     const ChefGame = require('../../app/job/Chef/game.jsx').default;
-    render(<ChefGame recipeId={1} />);
+    const correctSteps = ['a', 'b', 'c'];
+    const { getByText } = render(<ChefGame recipeId={1} testSteps={correctSteps} />);
+    fireEvent.press(getByText('Start Game'));
+    fireEvent.press(getByText('Submit'));
     global.fetch.mockResolvedValueOnce({
       json: () => Promise.resolve({ message: 'New result saved 🔥' })
     });
@@ -54,6 +61,16 @@ describe('ChefGame', () => {
         expect.stringMatching(/First time|Score saved successfully/i),
         expect.any(String)
       );
+    });
+  });
+
+  it('should show error Alert on wrong order', async () => {
+    const ChefGame = require('../../app/job/Chef/game.jsx').default;
+    const { getByText } = render(<ChefGame recipeId={1} />); // brez testSteps!
+    fireEvent.press(getByText('Start Game'));
+    fireEvent.press(getByText('Submit'));
+    await waitFor(() => {
+      expect(Alert.alert).toHaveBeenCalledWith('❌ Wrong!', 'Try again...');
     });
   });
 });

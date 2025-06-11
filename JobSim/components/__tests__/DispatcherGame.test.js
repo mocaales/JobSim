@@ -49,4 +49,20 @@ afterEach(() => {
   jest.clearAllMocks();
 });
 
-// TESTS REMOVED - see commit message
+describe('DispatcherGame', () => {
+  it('renders without crashing', () => {
+    const DispatcherGame = require('../../app/job/Dispatcher/game.jsx').default;
+    const { getByText } = render(<DispatcherGame />);
+  });
+
+  it('shows feedback Alert on result submit', async () => {
+    const DispatcherGame = require('../../app/job/Dispatcher/game.jsx').default;
+    const { getByText } = render(<DispatcherGame />);
+    fireEvent.press(getByText('Begin'));
+    await waitFor(() => expect(getByText('Submit')).toBeTruthy());
+    fireEvent.press(getByText('Submit'));
+    await waitFor(() => {
+      expect(Alert.alert).toHaveBeenCalledWith('Draw route first');
+    });
+  });
+});
