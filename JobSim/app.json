@@ -48,7 +48,7 @@
     },
     "owner": "alesmoca8",
     "assetBundlePatterns": [
-      "**/*"
+      "*/"
     ]
   }
 }

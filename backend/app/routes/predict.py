@@ -42,6 +42,7 @@ async def predict(request: PredictionRequest):
     scaled = scaler.transform(input_df)
     pred = model.predict(scaled)
     profession = label_encoder.inverse_transform(pred)[0]
+    print("Known features:", scaler.feature_names_in_)
 
     if existing:
         await db.responses.update_one(
