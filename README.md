@@ -146,6 +146,13 @@ uvicorn app.main:app --reload --port 8000
   <img src="JobSim/assets/media/dispatcher_game.gif" alt="Demo GIF" width="265"/>
 </p>
 
+---
+
+## Preizkusite aplikacijo
+
+<p align="center">
+  <img src="./JobSim/assets/media/QR_JobSim.png" alt="QR koda za zagon aplikacije" width="300"/>
+</p>
 
 ---
 
