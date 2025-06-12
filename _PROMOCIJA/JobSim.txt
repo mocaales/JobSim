@@ -1,0 +1,17 @@
+JobSim
+
+Mobilna aplikacija za raziskovanje poklicev in predikcijo kariere na podlagi uporabniških preferenc.
+
+Leto izdelave: 2025
+
+Aleš Močnik
+Jaka Cvikl
+Jernej Jerot
+
+Koda: https://github.com/mocaales/JobSim
+
+Kategorizacija: mobilna aplikacija, celovita informacijska rešitev
+
+Oznake: ReactNative, FastAPI, MongoDB, Python, Docker, REST, UporabaAI (together.ai), Agilen razvoj, GitHub, Expo, CatBoost, Clerk, UIUX
+
+JobSim je interaktivna izobraževalna mobilna aplikacija, ki uporabnikom omogoča raziskovanje različnih kariernih poti preko kvizov, simulacij in personaliziranih priporočil. Z uporabo strojnega učenja aplikacija analizira vprašalnik, zasnovan po Likertovi lestvici in predlaga najbolj ustrezno poklicno področje. Rezultati se shranjujejo v podatkovno bazo in omogočajo primerjavo uspešnosti iger prek Leaderboarda ter vizualizacijo rezultatov kvizov z DonutChart komponento. Uporabniki se v aplikacijo prijavijo z Google računom prek Clerk autentikacije. Backend API je razvit v FastAPI in pripravljen za oblačni deployment z Dockerjem preko Render.com. Aplikacija je prilagojena za delovanje z Expo Go in omogoča varno ter konsistentno shranjevanje podatkov. Projekt sledi načelom agilnega razvoja in ponuja temelj za nadaljnjo razširitev s svetovanjem, analitiko in dodatnimi kariernimi scenariji.
