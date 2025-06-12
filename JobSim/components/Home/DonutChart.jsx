@@ -71,7 +71,7 @@ export default function DonutChart({ email, selectedJob }) {
 
 const styles = StyleSheet.create({
     title: {
-      fontSize: 18,
+      fontSize: 16,
       fontWeight: '700',
       textAlign: 'left',
       marginBottom: 12,
@@ -84,7 +84,7 @@ const styles = StyleSheet.create({
     percentageSection: {
         alignItems: 'flex-start',
         justifyContent: 'center',
-        marginLeft: 16,
+        // marginLeft: 16,
         flex: 1,
         left: 40,
       },
